@@ -1,0 +1,11 @@
+﻿  BoxEnemy.cpp
+BoxEnemy.cpp(16): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  GameLogic.cpp
+GameLogic.cpp(11): error C2511: 'void GameLogic::updateTDS(BoxEnemy *)': overloaded member function not found in 'GameLogic'
+  e:\school and work\repo\projectfiasco\projectfiasco\GameLogic.h(9): note: see declaration of 'GameLogic'
+  GameView.cpp
+GameView.cpp(12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+GameView.cpp(33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Main.cpp
+Main.cpp(41): error C3867: 'GameView::getPos': non-standard syntax; use '&' to create a pointer to member
+  Timer.cpp

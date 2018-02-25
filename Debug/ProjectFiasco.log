@@ -1,0 +1,4 @@
+﻿  Main.cpp
+e:\school and work\repo\projectfiasco\projectfiasco\dialog.h(15): warning C4200: nonstandard extension used: zero-sized array in struct/union
+  e:\school and work\repo\projectfiasco\projectfiasco\dialog.h(15): note: This member will be ignored by a defaulted constructor or copy/move assignment operator
+  ProjectFiasco.vcxproj -> E:\School And Work\Repo\ProjectFiasco\Debug\ProjectFiasco.exe
