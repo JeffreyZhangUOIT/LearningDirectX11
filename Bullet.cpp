@@ -1,54 +1,49 @@
-#include "BoxEnemy.h"
+#include "Bullet.h"
 
-BoxEnemy::BoxEnemy(float posx, float posy, Renderer& ren) {
-	x = posx;
-	y = posy;
-	touch = false;
-	slope = 0;
+Bullet::Bullet(float* pos, Renderer& ren) {
+	x = pos[0] + 0.08f;
+	y = pos[1];
+	dir = pos[2];
 	createMesh(ren);
 }
 
-BoxEnemy::~BoxEnemy() {
+Bullet::~Bullet() {
 	m_pVertexBuffer->Release();
 	mIB->Release();
 }
 
-void BoxEnemy::update(float* playerPos) {
-	slope = atan2((playerPos[0] - x), (playerPos[1] - y));
+bool Bullet::update() {
 
-	if ((x - playerPos[0]) > 0) {
-		x -= 0.005f;
-	}
-	if ((x - playerPos[0]) < 0) {
-		x += 0.005f;
-	}
-	if ((y - playerPos[1]) > 0) {
-		y -= 0.005f;
-	}
-	if ((y - playerPos[1]) < 0) {
-		y += 0.005f;
+	if (fabs(x) > 1.2f || fabs(y) > 1.2f) {
+		return false;
 	}
 	
-	if ((fabs(y - playerPos[1]) < 0.05f) && (fabs(x - playerPos[0]) < 0.05f)) 
-	{
-		touch = true;
+	if (dir > 0) {
+		y++;
 	}
-	
-	
+	if (dir < 0) {
+		y--;
+	}
+	if (fabs(dir) > 0.5*3.14159265) {
+		x++;
+	}
+	if (fabs(dir) < 0.5*3.14159265) {
+		x--;
+	}
 
 	DirectX::XMFLOAT4 p1, p2, p3, p4;
 	DirectX::XMVECTOR scale = DirectX::XMVectorSet(1, 1, 1, 0);
 	DirectX::XMVECTOR translate = DirectX::XMVectorSet(x, y, 0, 0);
-	DirectX::XMVECTOR RotationQuaternion = DirectX::XMQuaternionRotationAxis({ 0, 0, -1, 0 }, slope);
+	DirectX::XMVECTOR RotationQuaternion = DirectX::XMQuaternionRotationAxis({ 0, 0, -1, 0 }, dir);
 	DirectX::XMVECTOR RotationCenter = DirectX::XMVectorSet(0, 0, 0, 0);
 	DirectX::XMMATRIX transform = DirectX::XMMatrixAffineTransformation(scale, RotationCenter, RotationQuaternion, translate);
 
 	DirectX::XMFLOAT4X4 data;
 	XMStoreFloat4x4(&data, transform);
-	DirectX::XMVECTOR v1 = DirectX::XMVectorSet(-0.05f, -0.05f, 0, 1);
-	DirectX::XMVECTOR v2 = DirectX::XMVectorSet(0.05f, -0.05f, 0, 1);
-	DirectX::XMVECTOR v3 = DirectX::XMVectorSet(-0.05f, 0.05f, 0, 1);
-	DirectX::XMVECTOR v4 = DirectX::XMVectorSet(0.05f, 0.05f, 0, 1);
+	DirectX::XMVECTOR v1 = DirectX::XMVectorSet(-0.01f, -0.01f, 0, 1);
+	DirectX::XMVECTOR v2 = DirectX::XMVectorSet(0.01f, -0.01f, 0, 1);
+	DirectX::XMVECTOR v3 = DirectX::XMVectorSet(-0.01f, 0.01f, 0, 1);
+	DirectX::XMVECTOR v4 = DirectX::XMVectorSet(0.01f, 0.01f, 0, 1);
 
 	v1 = DirectX::XMVector4Transform(v1, transform);
 	v2 = DirectX::XMVector4Transform(v2, transform);
@@ -61,10 +56,10 @@ void BoxEnemy::update(float* playerPos) {
 	DirectX::XMStoreFloat4(&p4, v4);
 
 	Vertex newVertices[] = {
-	{ p1.x, p1.y, 0, 1, 1, 1, 1 },
-	{ p2.x, p2.y, 0, 1, 1, 1, 1 },
-	{ p3.x, p3.y, 0, 1, 1, 1, 1 },
-	{ p4.x, p4.y, 0, 1, 1, 1, 1 }
+		{ p1.x, p1.y, 0, 1, 183/255.0f, 30/255.0f, 1 },
+		{ p2.x, p2.y, 0, 1, 183 / 255.0f, 30 / 255.0f, 1 },
+		{ p3.x, p3.y, 0, 1, 183 / 255.0f, 30 / 255.0f, 1 },
+		{ p4.x, p4.y, 0, 1, 183 / 255.0f, 30 / 255.0f, 1 }
 	};
 
 	memcpy(m_pVertices, newVertices, sizeof(m_pVertices));
@@ -74,21 +69,23 @@ void BoxEnemy::update(float* playerPos) {
 		2, 1, 0,
 		1, 2, 3
 	};
+
 	memcpy(m_pIndices, newIndices, sizeof(m_pIndices));
+
+	return true;
 }
 
-void BoxEnemy::draw(Renderer& renderer) {
-
+void Bullet::draw(Renderer& renderer) {
 	D3D11_MAPPED_SUBRESOURCE resource;
 	renderer.getDeviceContext()->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 
 	memcpy(resource.pData, m_pVertices, sizeof(m_pVertices));
 	renderer.getDeviceContext()->Unmap(m_pVertexBuffer, 0);
 
+
 	renderer.getDeviceContext()->Map(mIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 	memcpy(resource.pData, m_pIndices, sizeof(m_pIndices));
 	renderer.getDeviceContext()->Unmap(mIB, 0);
-
 	auto deviceContext = renderer.getDeviceContext();
 
 	// Bind our Player shaders
@@ -105,15 +102,9 @@ void BoxEnemy::draw(Renderer& renderer) {
 	deviceContext->DrawIndexed(6, 0, 0);
 
 }
-
-bool BoxEnemy::checkCollision(){
-	return touch;
-}
-
-void BoxEnemy::createMesh(Renderer& ren) {
+void Bullet::createMesh(Renderer& ren) {
 
 	// Create our vertext buffer
-
 	auto vertexBufferDesc = CD3D11_BUFFER_DESC(sizeof(m_pVertices), D3D11_BIND_VERTEX_BUFFER);
 	vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;

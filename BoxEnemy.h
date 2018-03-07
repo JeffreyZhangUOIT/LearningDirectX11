@@ -6,7 +6,7 @@ class BoxEnemy {
 public:
 	BoxEnemy(float posx, float posy, Renderer& ren);
 	~BoxEnemy();
-	void update(Renderer& ren, float* playerPos);
+	void update(float* playerPos);
 	void draw(Renderer& ren);
 	bool checkCollision();
 	
@@ -23,6 +23,19 @@ private:
 	};
 
 	bool touch;
+
+	Vertex m_pVertices[4] = {
+		{ 1, 0, 0, 1, 1, 1, 1 },
+		{ 0, 1, 0, 1, 1, 1, 1 },
+		{ 0, 0, 0, 1, 1, 1, 1 },
+		{ 1, 1, 0, 1, 1, 1, 1 }
+	};
+
+	DWORD m_pIndices[6] =
+	{
+		0, 1, 2,
+		1, 2, 3
+	};
 
 
 };

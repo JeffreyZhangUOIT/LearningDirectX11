@@ -21,6 +21,11 @@ float* GameView::changeAim(int sw, int sh) {
 
 }
 
+void GameView::mouseDown(MSG msg) {
+	if (msg.message == WM_LBUTTONDOWN) {
+		mDown = true;
+	}
+}
 float* GameView::changePos() {
 	slope = atan2((m_pAim[0] - x), (m_pAim[1] - y));
 
@@ -55,6 +60,16 @@ float* GameView::changePos() {
 	return m_pPos;
 
 }
+
+bool GameView::getMouse() {
+	return mDown;
+}
+void GameView::update(int sw, int sh) {
+	mDown = false;
+	changeAim(sw, sh);
+	changePos();
+}
+
 float* GameView::getPos() {
 	return m_pPos;
 

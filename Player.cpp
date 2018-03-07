@@ -46,6 +46,7 @@ void Player::update(Renderer& renderer, float * pos) {
 
 	Vertex vertices[] = {
 	{ p1.x, p1.y, 0, 1, 1, 1, 1 },
+
 	{ p2.x, p2.y, 0, 1, 1, 1, 1 },
 	{ p3.x, p3.y, 0, 1, 1, 1, 1 },
 	};
