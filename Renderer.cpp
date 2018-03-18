@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include <fstream>
+
 #include <vector>
 
 
@@ -7,10 +8,12 @@ Renderer::Renderer(Window& window) {
 	createDevice(window);
 	createRenderTarget();
 	createShader();
+
 }
 
 Renderer::~Renderer() {
 	// Render target
+	m_pSwapchain->SetFullscreenState(FALSE, NULL);
 	m_pInputLayout->Release();
 	m_pPixelShader->Release();
 	m_pVertexShader->Release();
@@ -24,14 +27,18 @@ Renderer::~Renderer() {
 }
 
 void Renderer::createDevice(Window& window) {
+
 	// swap chain
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = { 0 };
 	swapChainDesc.BufferCount = 1;
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.OutputWindow = window.getHandle();
+	swapChainDesc.BufferDesc.Width = window.w;                    // set the back buffer width
+	swapChainDesc.BufferDesc.Height = window.h;
 	swapChainDesc.SampleDesc.Count = 1; 
 	swapChainDesc.Windowed = true;
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	// Create the swap chain device
 	auto result = D3D11CreateDeviceAndSwapChain(
@@ -63,6 +70,7 @@ void Renderer::createRenderTarget() {
 	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	bd.CPUAccessFlags = 0;
 
+
 	HRESULT hr; 
 
 	hr = m_pDevice->CreateBuffer(&bd, NULL, &m_pConstantBuffer);
@@ -81,7 +89,7 @@ void Renderer::createRenderTarget() {
 }
 
 void Renderer::beginFrame() {
-
+	
 	// Bind render target
 	m_pDeviceContext->OMSetRenderTargets(1, &m_pRenderTargetView, nullptr);
 
@@ -142,3 +150,4 @@ void Renderer::createShader() {
 	};
 	m_pDevice->CreateInputLayout(layout, 2, vsData.data(), vsData.size(), &m_pInputLayout);
 }
+

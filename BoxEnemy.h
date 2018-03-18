@@ -5,12 +5,17 @@
 class BoxEnemy {
 public:
 	BoxEnemy(float posx, float posy, Renderer& ren);
+	BoxEnemy(const BoxEnemy &b2);
 	~BoxEnemy();
 	void update(float* playerPos);
 	void draw(Renderer& ren);
 	bool checkCollision();
-	
+	int EnemyHp = 2;
+	float* getPos();
+	bool bulletCollision(float* pos);
+
 private:
+	
 	void createMesh(Renderer& ren);
 	float x, y, slope;
 
@@ -26,9 +31,9 @@ private:
 
 	Vertex m_pVertices[4] = {
 		{ 1, 0, 0, 1, 1, 1, 1 },
-		{ 0, 1, 0, 1, 1, 1, 1 },
-		{ 0, 0, 0, 1, 1, 1, 1 },
-		{ 1, 1, 0, 1, 1, 1, 1 }
+	{ 0, 1, 0, 1, 1, 1, 1 },
+	{ 0, 0, 0, 1, 1, 1, 1 },
+	{ 1, 1, 0, 1, 1, 1, 1 }
 	};
 
 	DWORD m_pIndices[6] =
@@ -36,6 +41,5 @@ private:
 		0, 1, 2,
 		1, 2, 3
 	};
-
 
 };

@@ -1,8 +1,9 @@
 #pragma once
 #include "Window.h"
 #include <d3d11.h>
+#include <memory>
+#include <DXGI.h>
 #include <DirectXMath.h>
-
 
 class Renderer {
 public:
@@ -10,13 +11,17 @@ public:
 	~Renderer();
 	void beginFrame();
 	void endFrame();
+	
 	IDXGISwapChain* getSwapChain();
 	ID3D11Device* getDevice();
 	ID3D11DeviceContext* getDeviceContext();
 	D3D11_TEXTURE2D_DESC m_pBackBufferdesc;
 	void createShader();
+	bool fullscreen = true;
 
 private:
+	
+	void createDX10Device(Window& window);
 	void createDevice(Window& window);
 	void createRenderTarget();
 

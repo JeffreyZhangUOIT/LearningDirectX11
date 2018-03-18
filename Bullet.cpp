@@ -1,34 +1,83 @@
 #include "Bullet.h"
 
-Bullet::Bullet(float* pos, Renderer& ren) {
-	x = pos[0] + 0.08f;
+Bullet::Bullet(float* pos, Renderer& ren) 
+{
+	x = pos[0];
 	y = pos[1];
+	point = new float[2];
+	point[0] = x;
+	point[1] = y;
 	dir = pos[2];
+	m_pVertexBuffer = nullptr;
+	mIB = nullptr;
 	createMesh(ren);
-}
 
-Bullet::~Bullet() {
-	m_pVertexBuffer->Release();
-	mIB->Release();
-}
-
-bool Bullet::update() {
-
-	if (fabs(x) > 1.2f || fabs(y) > 1.2f) {
-		return false;
-	}
+	// Move the bullet out of the player, without drawing it. Helps make it seem like it's coming out of the right place.
+	update();
+	update();
+	update();
 	
-	if (dir > 0) {
-		y++;
+}
+
+Bullet::Bullet(const Bullet &bul) {
+	x = bul.x;
+	y = bul.y;
+	dir = bul.dir;
+	*m_pVertexBuffer = *bul.m_pVertexBuffer;
+	*mIB = *bul.mIB;
+	point = nullptr;
+	point =  new float[2];
+	point[0] = x;
+	point[1] = y;
+}
+
+Bullet::~Bullet() 
+{
+	// Move constructor doesn't work, needs fixing. This is a memory leak.
+	if (m_pVertexBuffer) {
+		//m_pVertexBuffer->Release();
 	}
-	if (dir < 0) {
-		y--;
+	//m_pVertexBuffer->Release();
+	if (mIB) {
+		//mIB->Release();
 	}
-	if (fabs(dir) > 0.5*3.14159265) {
-		x++;
+	//mIB->Release();
+
+	if (point) {
+		//delete point;
 	}
-	if (fabs(dir) < 0.5*3.14159265) {
-		x--;
+	//free(point);
+}
+
+void Bullet::update() 
+{
+	OOB = false;
+	if ((dir > 0) & (dir < 0.5f* 3.14f)) {
+		y += 0.03f * cosf(fabs(dir));
+	}
+	if (dir > 0.5f*3.14) {
+		y -= 0.03f * -cosf(fabs(dir));
+	}
+	if ((dir < 0) & (dir > -0.5f*3.14)) {
+		y += 0.03f * cosf(fabs(dir));
+	}
+	if (dir < -0.5f*3.14) {
+		y -= 0.03f * -cosf(fabs(dir));
+	}
+	if ((dir > 0) & (dir < 0.5f* 3.14f)) {
+		x += 0.03f * sinf(fabs(dir));
+	}
+	if (dir > 0.5f*3.14) {
+		x += 0.03f * sinf(fabs(dir));
+	}
+	if ((dir < 0) & (dir > -0.5f*3.14)){
+		x -= 0.03f * sinf(fabs(dir));
+	}
+	if (dir < -0.5f*3.14) {
+		x -= 0.03f * sinf(fabs(dir));
+	}
+	if (fabs(x) > 1.2f || fabs(y) > 1.2f) {
+		OOB = true;
 	}
 
 	DirectX::XMFLOAT4 p1, p2, p3, p4;
@@ -56,10 +105,10 @@ bool Bullet::update() {
 	DirectX::XMStoreFloat4(&p4, v4);
 
 	Vertex newVertices[] = {
-		{ p1.x, p1.y, 0, 1, 183/255.0f, 30/255.0f, 1 },
-		{ p2.x, p2.y, 0, 1, 183 / 255.0f, 30 / 255.0f, 1 },
-		{ p3.x, p3.y, 0, 1, 183 / 255.0f, 30 / 255.0f, 1 },
-		{ p4.x, p4.y, 0, 1, 183 / 255.0f, 30 / 255.0f, 1 }
+		{ p1.x, p1.y, 0, 1, 0.7176f, 0.1176f, 1 },
+		{ p2.x, p2.y, 0, 1, 0.7176f, 0.1176f, 1 },
+		{ p3.x, p3.y, 0, 1, 0.7176f, 0.1176f, 1 },
+		{ p4.x, p4.y, 0, 1, 0.7176f, 0.1176f, 1 }
 	};
 
 	memcpy(m_pVertices, newVertices, sizeof(m_pVertices));
@@ -71,22 +120,45 @@ bool Bullet::update() {
 	};
 
 	memcpy(m_pIndices, newIndices, sizeof(m_pIndices));
-
-	return true;
 }
 
-void Bullet::draw(Renderer& renderer) {
+float * Bullet::getPos() 
+{
+	if (point) 
+	{
+		point[0] = x;
+		point[1] = y;
+		return point;
+	}
+	else
+	{
+		point = new float[2];
+		point[0] = x;
+		point[1] = y;
+		return point;
+	}
+}
+
+void Bullet::draw(Renderer& renderer) 
+{
+	auto deviceContext = renderer.getDeviceContext();
+
+	// Update vertex and pixel buffers
 	D3D11_MAPPED_SUBRESOURCE resource;
-	renderer.getDeviceContext()->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	if (!m_pVertexBuffer) {
+		createMesh(renderer);
+	}
+
+	deviceContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 
 	memcpy(resource.pData, m_pVertices, sizeof(m_pVertices));
-	renderer.getDeviceContext()->Unmap(m_pVertexBuffer, 0);
+	deviceContext->Unmap(m_pVertexBuffer, 0);
 
 
-	renderer.getDeviceContext()->Map(mIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	deviceContext->Map(mIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 	memcpy(resource.pData, m_pIndices, sizeof(m_pIndices));
-	renderer.getDeviceContext()->Unmap(mIB, 0);
-	auto deviceContext = renderer.getDeviceContext();
+	deviceContext->Unmap(mIB, 0);
+
 
 	// Bind our Player shaders
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -102,7 +174,9 @@ void Bullet::draw(Renderer& renderer) {
 	deviceContext->DrawIndexed(6, 0, 0);
 
 }
-void Bullet::createMesh(Renderer& ren) {
+
+void Bullet::createMesh(Renderer& ren) 
+{
 
 	// Create our vertext buffer
 	auto vertexBufferDesc = CD3D11_BUFFER_DESC(sizeof(m_pVertices), D3D11_BIND_VERTEX_BUFFER);
@@ -113,7 +187,7 @@ void Bullet::createMesh(Renderer& ren) {
 
 	ren.getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_pVertexBuffer);
 
-	
+
 	D3D11_BUFFER_DESC ibd;
 	ibd.Usage = D3D11_USAGE_DYNAMIC;
 	ibd.ByteWidth = sizeof(DWORD) * 6;

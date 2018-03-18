@@ -15,12 +15,12 @@ Dialog::~Dialog() {
 	//delete m_pVertexBuffer;
 }
 
-void Dialog::update(Renderer& ren) {
+void Dialog::update(Renderer& ren, float* boxDimen) {
 	Vertex vertices[] = {
-	{ -0.95f, -0.95f, 0, 1, 1, 1, 0.4f },
-	{ 0.95f, -0.95f, 0, 1, 1, 1, 0.4f },
-	{ -0.95f, -0.50f, 0, 1, 1, 1, 0.4f },
-	{ 0.95f, -0.50f, 0, 1, 1, 1, 0.4f }
+	{ boxDimen[2], boxDimen[3], 0, 1, 1, 1, 0.4f },
+	{ boxDimen[0], boxDimen[3], 0, 1, 1, 1, 0.4f },
+	{ boxDimen[2], boxDimen[1], 0, 1, 1, 1, 0.4f },
+	{ boxDimen[0], boxDimen[1], 0, 1, 1, 1, 0.4f }
 	};
 
 	D3D11_MAPPED_SUBRESOURCE resource;

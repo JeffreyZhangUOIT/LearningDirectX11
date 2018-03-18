@@ -5,25 +5,32 @@
 #include "Cursor.h"
 #include "BoxEnemy.h"
 #include "Bullet.h"
-
+#include <vector>
+#include <cstdlib>
+#include <ctime>
 
 class GameLogic {
 public:
 	GameLogic(Renderer& ren);
 	~GameLogic();
-	void spawnBullet(bool mDown, float* pos, Renderer& ren);
-	void updateTDS(float* pos);
+
+	void updateTDS(Renderer& ren, float* pos);
 	void initTDS(Renderer& ren);
+	void spawnBullet(bool mDown, float* pos, float* aim, Renderer& ren);
+	std::vector<BoxEnemy> boxes;
 	void drawTDS(Renderer& ren);
-	bool gameOver();
+	void enemyConductor(Renderer& ren, float* pos);
+	void spawnBoxEnemy(float x, float y, Renderer& ren);
+	bool playerDamage();
 
 private:
-	void destroyBullet(int k);
+
 	int delay = 0;
-	Bullet ** bulletArray = nullptr;
-	BoxEnemy * b1 = nullptr;
-	BoxEnemy * b2 = nullptr;
-	BoxEnemy * b3 = nullptr;
-	BoxEnemy * b4 = nullptr;
+	void killEnemy(BoxEnemy ** box);
+	int difficulty = 2;
+
+	std::vector<Bullet> collection;
+
+
 
 };

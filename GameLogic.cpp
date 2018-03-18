@@ -2,105 +2,130 @@
 
 GameLogic::GameLogic(Renderer& ren) {
 	initTDS(ren);
-	
 }
 
 GameLogic::~GameLogic() {
-	delete b1; delete b2; delete b3; delete b4;
-	for (int k = 0; k < 100; k++) {
-		if (bulletArray[k] != nullptr) {
-			delete bulletArray[k];
-			bulletArray[k] = nullptr;
-		}
-	}
-	free(bulletArray);
+	collection.clear();
+	boxes.clear();
 }
 
-void GameLogic::spawnBullet(bool mDown, float* pos, Renderer& ren) 
+void GameLogic::spawnBullet(bool mDown, float* pos, float* aim,  Renderer& ren)
 {
-	if (mDown &&(delay <= 0) ){
-		for (int k = 0; k < 100; k++) {
-			if (bulletArray[k] == nullptr) {
-				bulletArray[k] = new Bullet(pos, ren);
-				delay = 50;
-				break;
-			}
-		}
+	if (((GetKeyState(VK_LBUTTON) & 0x80) != 0) & delay <= 0)
+	{
+		collection.emplace_back(pos, ren);
+		delay = 3;
+		
 	}
+
 }
 
-void GameLogic::destroyBullet(int k)
-{
-	delete bulletArray[k];
-}
-void GameLogic::updateTDS(float* pos) {
+void GameLogic::updateTDS( Renderer& ren, float* pos) {
+
+	enemyConductor(ren, pos);
 	if (delay > 0) {
 		delay--;
 	}
-	for (int k = 0; k < 100; k++) {
+
+	for (std::vector<Bullet>::iterator bul = collection.begin(); bul != collection.end();)
+	{
+
+		bul->update();
 		bool outOfBounds = false;
-		if (bulletArray[k] != nullptr) {
-			 outOfBounds = bulletArray[k]->update();
+		outOfBounds = bul->OOB;
+
+		if (outOfBounds)
+		{
+			bul = collection.erase(bul);
 		}
-		if (outOfBounds) {
-			destroyBullet(k);
+		else
+		{
+			bul++;
+		}
+
+	}
+
+	for (std::vector<BoxEnemy>::iterator it = boxes.begin(); it != boxes.end();)
+	{
+		it->update(pos);
+		for (std::vector<Bullet>::iterator bul = collection.begin(); bul != collection.end();)
+		{
+			float * bPos = bul->getPos();
+			
+			if (it->bulletCollision(bPos))
+			{
+				bul = collection.erase(bul);
+			}
+			
+			else
+			{
+				bul++;
+			}
+		}
+
+		if (it->EnemyHp <= 0) {
+			it = boxes.erase(it);
+		}
+		else {
+			it++;
 		}
 	}
-	b1->update(pos);
-	b2->update(pos);
-	b3->update(pos);
-	b4->update(pos);
-		
 }
 
-void GameLogic::drawTDS(Renderer& ren) {
-	for (int k = 0; k < 100; k++) {
-		if (bulletArray[k] != nullptr) {
-			bulletArray[k]->draw(ren);
-		}
+
+void GameLogic::spawnBoxEnemy(float x, float y, Renderer& ren) {
+	boxes.emplace_back(x, y, ren);
+	
+}
+
+void GameLogic::drawTDS(Renderer& ren) 
+{
+
+	for (std::vector<Bullet>::iterator it = collection.begin(); it != collection.end(); ++it)
+	{
+		it->draw(ren);
 	}
-	b1->draw(ren);
-	b2->draw(ren);
-	b3->draw(ren);
-	b4->draw(ren);
+
+	for (std::vector<BoxEnemy>::iterator it = boxes.begin(); it != boxes.end(); ++it)
+	{
+		it->draw(ren);
+	}
+
 }
 
 void GameLogic::initTDS(Renderer& ren) {
-	if (bulletArray) {
-		for (int k = 0; k < 100; k++) {
-			if (bulletArray[k]) {
-				delete bulletArray[k];
-			}
-		}
-		free(bulletArray);
-		bulletArray == nullptr;
-	}
+	boxes.clear();
+	collection.clear();
 
-	if (b1 != nullptr) {
-		delete b1;
-	}
-	if (b2 != nullptr) {
-		delete b2;
-	}
-	if (b3 != nullptr) {
-		delete b3;
-	}
-	if (b4 != nullptr) {
-		delete b4;
-	}
-	b1 = new BoxEnemy(-1, -1, ren);
-	b2 = new BoxEnemy(1, -1, ren);
-	b3 = new BoxEnemy(-1, 1, ren);
-	b4 = new BoxEnemy(1, 1, ren);
-	bulletArray = (Bullet **) malloc(sizeof(Bullet*) * 100);
-	for (int k = 0; k < 100; k++) {
-		bulletArray[k] = nullptr;
-	}
+
+	srand(static_cast <unsigned> (time(0)));
+
 }
 
-bool GameLogic::gameOver() {
-	if (b1->checkCollision() || b2->checkCollision() || b3->checkCollision() || b4->checkCollision()) {
-		return true;
+bool GameLogic::playerDamage() {
+	
+	for (std::vector<BoxEnemy>::iterator it = boxes.begin(); it != boxes.end();)
+	{
+		if (it->checkCollision()) {
+			boxes.erase(it);
+			return true;
+		}
+		else
+		{
+			it++;
+		}
 	}
 	return false;
 }
+
+void GameLogic::enemyConductor(Renderer& ren, float* pos) {
+	float x, y;
+	x = (static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 2.6f))) - 1.3f;
+	y = (static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 2.6f))) - 1.3f;
+	if (boxes.size() < (difficulty * 4)) {
+		if (((fabs(x - pos[0]) > 0.3f) || (fabs(x - pos[0]) > 0.3f))) {
+			spawnBoxEnemy(x, y, ren);
+		}
+	}
+}
+

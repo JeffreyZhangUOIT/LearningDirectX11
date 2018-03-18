@@ -35,16 +35,25 @@ void Text::CreateDeviceResources(Renderer& ren)
 			dpiX,
 			dpiY, D2D1_RENDER_TARGET_USAGE_NONE, D2D1_FEATURE_LEVEL_DEFAULT
 		);
+
 	// Create a Direct2D render target which can draw into the surface in the swap chain
 
 	IDXGISurface* backBuffer;
-	ren.getSwapChain()->GetBuffer(0, __uuidof(IDXGISurface), (void **)&backBuffer);
+	hr = ren.getSwapChain()->GetBuffer(0, IID_PPV_ARGS(&backBuffer));
+	if (FAILED(hr))
+	{
+		exit(14);
+	}
 
 	if (!pRT_)
 	{
 		// Create a Direct2D render target. Pointer is unable to be created correctly yet.
 		hr = pD2DFactory_->CreateDxgiSurfaceRenderTarget(backBuffer, &props, &pRT_);
-
+		
+		if (FAILED(hr))
+		{
+			exit(15);
+		}
 		// Create a black brush.
 		
 		hr = pRT_->CreateSolidColorBrush(
@@ -129,7 +138,7 @@ void Text::DrawMyText(float x1, float y1, float x2, float y2, const wchar_t* myT
 
 Text::Text(Renderer& ren) {
 	CreateDeviceIndependentResources();
-	//CreateDeviceResources(ren);
+	CreateDeviceResources(ren);
 	CreateTextFormat();
 
 	//DrawMyText(RECT rc, const wchar_t* myTextString, int color);

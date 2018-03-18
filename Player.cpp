@@ -8,16 +8,39 @@ struct Vertex {
 	float r, g, b, a;
 };
 
-
+void Player::init() {
+	playerHp = 3;
+	immunity = 0;
+}
 Player::Player(Renderer& ren) {
 	createMesh(ren);
+	init();
 }
 
 Player::~Player() {
 	m_pVertexBuffer->Release();
 }
 
-void Player::update(Renderer& renderer, float * pos) {
+void Player::update(Renderer& renderer, float * pos, bool dmg) {
+
+	if (dmg) {
+		if (immunity <= 0) {
+			playerHp--;
+			immunity = 100;
+		}
+	}
+
+	if (immunity > 0) {
+		immunity--;
+	}
+	if (playerHp <= 0) {
+		alive = false;
+
+	}
+
+	else {
+		alive = true;
+	}
 
 	//x = 0.5f; y = 0.5f;
 	DirectX::XMFLOAT4 p1, p2, p3;
@@ -46,10 +69,19 @@ void Player::update(Renderer& renderer, float * pos) {
 
 	Vertex vertices[] = {
 	{ p1.x, p1.y, 0, 1, 1, 1, 1 },
-
 	{ p2.x, p2.y, 0, 1, 1, 1, 1 },
 	{ p3.x, p3.y, 0, 1, 1, 1, 1 },
 	};
+	if (immunity > 0) {
+		vertices[0].g = 0.5f;
+		vertices[0].b = 0.5f;
+		vertices[1].g = 0.5f;
+		vertices[1].b = 0.5f;
+		vertices[2].g = 0.5f;
+		vertices[2].b = 0.5f;
+
+	}
+
 
 	D3D11_MAPPED_SUBRESOURCE resource;
 	renderer.getDeviceContext()->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);

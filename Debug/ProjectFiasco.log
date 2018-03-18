@@ -1,4 +1,15 @@
-﻿  Main.cpp
+﻿  Bullet.cpp
+  Generating Code...
+  Compiling...
+  Main.cpp
 e:\school and work\repo\projectfiasco\projectfiasco\dialog.h(15): warning C4200: nonstandard extension used: zero-sized array in struct/union
   e:\school and work\repo\projectfiasco\projectfiasco\dialog.h(15): note: This member will be ignored by a defaulted constructor or copy/move assignment operator
+e:\school and work\repo\projectfiasco\projectfiasco\main.cpp(19): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+e:\school and work\repo\projectfiasco\projectfiasco\main.cpp(20): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+e:\school and work\repo\projectfiasco\projectfiasco\main.cpp(21): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+e:\school and work\repo\projectfiasco\projectfiasco\main.cpp(22): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+  GameLogic.cpp
+e:\school and work\repo\projectfiasco\projectfiasco\gamelogic.cpp(14): warning C4554: '&': check operator precedence for possible error; use parentheses to clarify precedence
+e:\school and work\repo\projectfiasco\projectfiasco\gamelogic.cpp(125): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
   ProjectFiasco.vcxproj -> E:\School And Work\Repo\ProjectFiasco\Debug\ProjectFiasco.exe

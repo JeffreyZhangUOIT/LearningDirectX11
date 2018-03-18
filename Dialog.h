@@ -6,7 +6,7 @@ class Dialog {
 public:
 	Dialog(Renderer& ren);
 	~Dialog();
-	void update(Renderer& ren);
+	void update(Renderer& ren, float* boxDimen);
 	void draw(Renderer& ren);
 private:
 	void createMesh(Renderer& ren);

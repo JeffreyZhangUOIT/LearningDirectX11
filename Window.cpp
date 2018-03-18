@@ -12,6 +12,8 @@ LRESULT CALLBACK WinProc(HWND handle, UINT msg, WPARAM wparam, LPARAM lparam)
 
 Window::Window(int width, int height) 
 {
+	w = width;
+	h = height;
 	// Define window style
 	WNDCLASS wc = { 0 };
 	wc.style = CS_OWNDC;
@@ -21,7 +23,7 @@ Window::Window(int width, int height)
 	RegisterClass(&wc);
 
 	// Create the window
-	m_pHandle = CreateWindow("GenericWindow", "Jeff's Playground",
+	m_pHandle = CreateWindow("GenericWindow", "A Game. Hopefully.",
 		WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_VISIBLE,
 		100, 100, width, height,
 		nullptr, nullptr, nullptr, nullptr);
