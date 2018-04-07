@@ -96,13 +96,9 @@ int CALLBACK WinMain(HINSTANCE appInstance, HINSTANCE prevInstance, LPSTR cmdLin
 		if (gamemode == 0) 
 		{
 			ren.beginFrame();
-			//bill.update();
-			//bill.draw(ren);
-			// Spawned bullets are spawned, but don't get drawn. i think it's pointer->method.
 			gameLogic.spawnBullet(playerView.getMouse(), playerView.getPos(), playerView.getAim(), ren);
 			gameLogic.updateTDS(ren, playerView.getPos());
-			
-			gameLogic.drawTDS(ren);
+
 			cursor.update(ren, playerView.getAim());
 			cursor.draw(ren);
 

@@ -6,9 +6,6 @@ BoxEnemy::BoxEnemy(float posx, float posy, Renderer& ren) {
 	EnemyHp = 3;
 	touch = false;
 	slope = 0;
-	m_pVertexBuffer = nullptr;
-	mIB = nullptr;
-	createMesh(ren);
 }
 
 BoxEnemy::BoxEnemy(const BoxEnemy &b2) {
@@ -17,10 +14,8 @@ BoxEnemy::BoxEnemy(const BoxEnemy &b2) {
 	EnemyHp = b2.EnemyHp;
 	touch = b2.touch;
 	slope = b2.slope;
-	m_pVertexBuffer = b2.m_pVertexBuffer;
-	mIB = b2.mIB;
-	
 }
+
 bool BoxEnemy::bulletCollision(float* pos) 
 {
 	if ((fabs(y - pos[1]) < 0.05f) && (fabs(x - pos[0]) < 0.05f))
@@ -32,16 +27,14 @@ bool BoxEnemy::bulletCollision(float* pos)
 	return false;
 }
 BoxEnemy::~BoxEnemy() {
-	// Move constructor doesn't work yet. This is a memory leak.
-	//m_pVertexBuffer->Release();
-	//mIB->Release();
+
 }
 float* BoxEnemy::getPos() 
 {
 	float point[2] = { x, y };
 	return point;
 }
-void BoxEnemy::update(float* playerPos) {
+BoxEnemy::ArrVer BoxEnemy::update(float* playerPos) {
 	slope = atan2((playerPos[0] - x), (playerPos[1] - y));
 
 	if ((x - playerPos[0]) > 0) {
@@ -90,23 +83,15 @@ void BoxEnemy::update(float* playerPos) {
 	DirectX::XMStoreFloat4(&p3, v3);
 	DirectX::XMStoreFloat4(&p4, v4);
 
-	Vertex newVertices[] = {
-		{ p1.x, p1.y, 0, 1, 1, 1, 1 },
-	{ p2.x, p2.y, 0, 1, 1, 1, 1 },
-	{ p3.x, p3.y, 0, 1, 1, 1, 1 },
-	{ p4.x, p4.y, 0, 1, 1, 1, 1 }
-	};
+	ArrVer newVertices;
+	newVertices.vertices[0] = { p1.x, p1.y, 0, 1, 1, 1, 1 };
+	newVertices.vertices[1] = { p2.x, p2.y, 0, 1, 1, 1, 1 };
+	newVertices.vertices[2] = { p3.x, p3.y, 0, 1, 1, 1, 1 };
+	newVertices.vertices[3] = { p4.x, p4.y, 0, 1, 1, 1, 1 };
 
-	memcpy(m_pVertices, newVertices, sizeof(m_pVertices));
-
-	DWORD newIndices[6] =
-	{
-		2, 1, 0,
-		1, 2, 3
-	};
-	memcpy(m_pIndices, newIndices, sizeof(m_pIndices));
+	return newVertices;
 }
-
+/*
 void BoxEnemy::draw(Renderer& renderer) {
 	auto deviceContext = renderer.getDeviceContext();
 
@@ -136,11 +121,12 @@ void BoxEnemy::draw(Renderer& renderer) {
 	deviceContext->DrawIndexed(6, 0, 0);
 
 }
-
+*/
 bool BoxEnemy::checkCollision(){
 	return touch;
 }
 
+/*
 void BoxEnemy::createMesh(Renderer& ren) {
 
 	// Create our vertext buffer
@@ -181,3 +167,4 @@ void BoxEnemy::createMesh(Renderer& ren) {
 	ren.getDevice()->CreateBuffer(&ibd, &iinitData, &mIB);
 	ren.getDeviceContext()->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
 }
+*/

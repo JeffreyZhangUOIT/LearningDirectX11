@@ -8,9 +8,6 @@ Bullet::Bullet(float* pos, Renderer& ren)
 	point[0] = x;
 	point[1] = y;
 	dir = pos[2];
-	m_pVertexBuffer = nullptr;
-	mIB = nullptr;
-	createMesh(ren);
 
 	// Move the bullet out of the player, without drawing it. Helps make it seem like it's coming out of the right place.
 	update();
@@ -20,11 +17,10 @@ Bullet::Bullet(float* pos, Renderer& ren)
 }
 
 Bullet::Bullet(const Bullet &bul) {
+
 	x = bul.x;
 	y = bul.y;
 	dir = bul.dir;
-	*m_pVertexBuffer = *bul.m_pVertexBuffer;
-	*mIB = *bul.mIB;
 	point = nullptr;
 	point =  new float[2];
 	point[0] = x;
@@ -33,23 +29,10 @@ Bullet::Bullet(const Bullet &bul) {
 
 Bullet::~Bullet() 
 {
-	// Move constructor doesn't work, needs fixing. This is a memory leak.
-	if (m_pVertexBuffer) {
-		//m_pVertexBuffer->Release();
-	}
-	//m_pVertexBuffer->Release();
-	if (mIB) {
-		//mIB->Release();
-	}
-	//mIB->Release();
 
-	if (point) {
-		//delete point;
-	}
-	//free(point);
 }
 
-void Bullet::update() 
+Bullet::ArrVer Bullet::update()
 {
 	OOB = false;
 	if ((dir > 0) & (dir < 0.5f* 3.14f)) {
@@ -104,22 +87,13 @@ void Bullet::update()
 	DirectX::XMStoreFloat4(&p3, v3);
 	DirectX::XMStoreFloat4(&p4, v4);
 
-	Vertex newVertices[] = {
-		{ p1.x, p1.y, 0, 1, 0.7176f, 0.1176f, 1 },
-		{ p2.x, p2.y, 0, 1, 0.7176f, 0.1176f, 1 },
-		{ p3.x, p3.y, 0, 1, 0.7176f, 0.1176f, 1 },
-		{ p4.x, p4.y, 0, 1, 0.7176f, 0.1176f, 1 }
-	};
+	Bullet::ArrVer newVertices;
+	newVertices.vertices[0] = { p1.x, p1.y, 0, 1, 0.7176f, 0.1176f, 1 };
+	newVertices.vertices[1] = { p2.x, p2.y, 0, 1, 0.7176f, 0.1176f, 1 };
+	newVertices.vertices[2] = { p3.x, p3.y, 0, 1, 0.7176f, 0.1176f, 1 };
+	newVertices.vertices[3] = { p4.x, p4.y, 0, 1, 0.7176f, 0.1176f, 1 };
 
-	memcpy(m_pVertices, newVertices, sizeof(m_pVertices));
-
-	DWORD newIndices[6] =
-	{
-		2, 1, 0,
-		1, 2, 3
-	};
-
-	memcpy(m_pIndices, newIndices, sizeof(m_pIndices));
+	return newVertices;
 }
 
 float * Bullet::getPos() 
@@ -139,9 +113,20 @@ float * Bullet::getPos()
 	}
 }
 
+/*
+{
+{ p1.x, p1.y, 0, 1, 0.7176f, 0.1176f, 1 },
+{ p2.x, p2.y, 0, 1, 0.7176f, 0.1176f, 1 },
+{ p3.x, p3.y, 0, 1, 0.7176f, 0.1176f, 1 },
+{ p4.x, p4.y, 0, 1, 0.7176f, 0.1176f, 1 }
+}
 void Bullet::draw(Renderer& renderer) 
 {
 	auto deviceContext = renderer.getDeviceContext();
+
+	if (m_pVertexBuffer == nullptr) {
+		createMesh(renderer);
+	}
 
 	// Update vertex and pixel buffers
 	D3D11_MAPPED_SUBRESOURCE resource;
@@ -175,32 +160,33 @@ void Bullet::draw(Renderer& renderer)
 
 }
 
-void Bullet::createMesh(Renderer& ren) 
+
+void Bullet::createMesh(Renderer& ren)
 {
+// Create our vertext buffer
+auto vertexBufferDesc = CD3D11_BUFFER_DESC(sizeof(m_pVertices), D3D11_BIND_VERTEX_BUFFER);
+vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+D3D11_SUBRESOURCE_DATA vertexData = { 0 };
+vertexData.pSysMem = m_pVertices;
 
-	// Create our vertext buffer
-	auto vertexBufferDesc = CD3D11_BUFFER_DESC(sizeof(m_pVertices), D3D11_BIND_VERTEX_BUFFER);
-	vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	D3D11_SUBRESOURCE_DATA vertexData = { 0 };
-	vertexData.pSysMem = m_pVertices;
-
-	ren.getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_pVertexBuffer);
+ren.getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_pVertexBuffer);
 
 
-	D3D11_BUFFER_DESC ibd;
-	ibd.Usage = D3D11_USAGE_DYNAMIC;
-	ibd.ByteWidth = sizeof(DWORD) * 6;
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ibd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	ibd.MiscFlags = 0;
-	ibd.StructureByteStride = 0;
+D3D11_BUFFER_DESC ibd;
+ibd.Usage = D3D11_USAGE_DYNAMIC;
+ibd.ByteWidth = sizeof(DWORD) * 6;
+ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+ibd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+ibd.MiscFlags = 0;
+ibd.StructureByteStride = 0;
 
-	// Specify the data to initialize the index buffer.
-	D3D11_SUBRESOURCE_DATA iinitData;
-	iinitData.pSysMem = m_pIndices;
+// Specify the data to initialize the index buffer.
+D3D11_SUBRESOURCE_DATA iinitData;
+iinitData.pSysMem = m_pIndices;
 
-	// Create the index buffer.
-	ren.getDevice()->CreateBuffer(&ibd, &iinitData, &mIB);
-	ren.getDeviceContext()->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
+// Create the index buffer.
+ren.getDevice()->CreateBuffer(&ibd, &iinitData, &mIB);
+ren.getDeviceContext()->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
 }
+*/
