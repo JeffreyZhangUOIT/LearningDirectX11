@@ -1,0 +1,39 @@
+﻿  BoxFactory.cpp
+e:\school and work\repo\projectfiasco\projectfiasco\Window.h(5): warning C4005: '_WIN32_WINNT': macro redefinition
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared\sdkddkver.h(215): note: see previous definition of '_WIN32_WINNT'
+e:\school and work\repo\projectfiasco\projectfiasco\BoxFactory.h(19): warning C4200: nonstandard extension used: zero-sized array in struct/union
+  e:\school and work\repo\projectfiasco\projectfiasco\BoxFactory.h(19): note: This member will be ignored by a defaulted constructor or copy/move assignment operator
+  Main.cpp
+e:\school and work\repo\projectfiasco\projectfiasco\Window.h(5): warning C4005: '_WIN32_WINNT': macro redefinition
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared\sdkddkver.h(215): note: see previous definition of '_WIN32_WINNT'
+e:\school and work\repo\projectfiasco\projectfiasco\BoxFactory.h(19): warning C4200: nonstandard extension used: zero-sized array in struct/union
+  e:\school and work\repo\projectfiasco\projectfiasco\BoxFactory.h(19): note: This member will be ignored by a defaulted constructor or copy/move assignment operator
+Main.cpp(37): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+Main.cpp(38): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+Main.cpp(39): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+Main.cpp(40): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+Main.cpp(223): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Main.cpp(224): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Main.cpp(225): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Main.cpp(226): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Main.cpp(227): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Main.cpp(240): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+Main.cpp(241): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Main.cpp(252): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Main.cpp(266): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Main.cpp(267): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Main.cpp(268): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  Settings.cpp
+Settings.cpp(88): warning C4474: 'fprintf' : too many arguments passed for format string
+  Settings.cpp(88): note: placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+  TextGrabber.cpp
+e:\school and work\repo\projectfiasco\projectfiasco\Window.h(5): warning C4005: '_WIN32_WINNT': macro redefinition
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\shared\sdkddkver.h(215): note: see previous definition of '_WIN32_WINNT'
+e:\school and work\repo\projectfiasco\projectfiasco\BoxFactory.h(19): warning C4200: nonstandard extension used: zero-sized array in struct/union
+  e:\school and work\repo\projectfiasco\projectfiasco\BoxFactory.h(19): note: This member will be ignored by a defaulted constructor or copy/move assignment operator
+  Generating code
+  9 of 733 functions ( 1.2%) were compiled, the rest were copied from previous compilation.
+    6 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  ProjectFiasco.vcxproj -> E:\School And Work\Repo\ProjectFiasco\Release\ProjectFiasco.exe

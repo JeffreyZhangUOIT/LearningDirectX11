@@ -162,38 +162,36 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AIPlayer.cpp" />
-    <ClCompile Include="BitMapClass.cpp" />
     <ClCompile Include="BoxEnemy.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="Cursor.cpp" />
-    <ClCompile Include="DDSTextureLoader.cpp" />
-    <ClCompile Include="Dialog.cpp" />
-    <ClCompile Include="FontClass.cpp" />
+    <ClCompile Include="BoxFactory.cpp" />
     <ClCompile Include="GameLogic.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameView.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
+    <ClCompile Include="TextGrabber.cpp" />
+    <ClCompile Include="TextHandler.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIPlayer.h" />
-    <ClInclude Include="BitMapClass.h" />
     <ClInclude Include="BoxEnemy.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="Cursor.h" />
-    <ClInclude Include="DDSTextureLoader.h" />
-    <ClInclude Include="Dialog.h" />
-    <ClInclude Include="FontClass.h" />
+    <ClInclude Include="BoxFactory.h" />
     <ClInclude Include="GameLogic.h" />
-    <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameView.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="Texture.h" />
+    <ClInclude Include="Settings.h" />
+    <ClInclude Include="SoundManager.h" />
+    <ClInclude Include="TextGrabber.h" />
+    <ClInclude Include="TextHandler.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
@@ -216,7 +214,11 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="cabri32.spritefont" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="modSolitude.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
