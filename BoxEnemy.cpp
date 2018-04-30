@@ -1,3 +1,21 @@
+/*
+Copyright 2017, 2018 Jeffrey Zhang
+
+This file is part of ProjectFiasco.
+
+ProjectFiasco is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ProjectFiasco is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "BoxEnemy.h"
 
 BoxEnemy::BoxEnemy(float posx, float posy, Renderer& ren) {
@@ -35,6 +53,7 @@ float* BoxEnemy::getPos()
 	return point;
 }
 BoxEnemy::ArrVer BoxEnemy::update(float* playerPos) {
+	float hpPercent = (EnemyHp / 5.0f);
 	slope = atan2((playerPos[0] - x), (playerPos[1] - y));
 
 	if ((x - playerPos[0]) > 0) {
@@ -88,6 +107,11 @@ BoxEnemy::ArrVer BoxEnemy::update(float* playerPos) {
 	newVertices.vertices[1] = { p2.x, p2.y, 0, 1, 1, 1, 1 };
 	newVertices.vertices[2] = { p3.x, p3.y, 0, 1, 1, 1, 1 };
 	newVertices.vertices[3] = { p4.x, p4.y, 0, 1, 1, 1, 1 };
+
+	newVertices.vertices[4] = { x - 0.05f, y + 0.06f, 0, 1, 0, 0, 1 };
+	newVertices.vertices[5] = { ((x - 0.05f) + (0.17f * hpPercent)), y + 0.06f, 0, 1, 0, 0, 1 };
+	newVertices.vertices[6] = { x - 0.05f, y + 0.08f, 0, 1, 0, 0, 1 };
+	newVertices.vertices[7] = { ((x - 0.05f) + (0.17f * hpPercent)), y + 0.08f, 0, 1, 0, 0, 1 };
 
 	return newVertices;
 }

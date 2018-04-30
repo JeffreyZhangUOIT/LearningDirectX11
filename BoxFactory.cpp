@@ -16,67 +16,85 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "Cursor.h"
+#include "BoxFactory.h"
 
-struct Vertex {
+struct Vertex
+{
 	float x, y, z;
 	float r, g, b, a;
 };
 
-Mouse::Mouse(Renderer& ren){
+BoxFactory::BoxFactory(Renderer& ren) {
 	createMesh(ren);
-	x = 0;
-	y = 0;
 }
 
-Mouse::~Mouse(){
-	m_pVertexBuffer->Release();
-	mIB->Release();
+BoxFactory::~BoxFactory() {
+	//delete mIB;
+	//delete m_pVertexBuffer;
 }
 
-void Mouse::update(Renderer& renderer, float* aim) {
-	
+void BoxFactory::update(Renderer& ren, float* boxDimen, color setColor) {
 	Vertex vertices[] = {
-	{ aim[0]-0.01f, aim[1]-0.01f, 0.001f, 0, 0, 1, 1 },
-	{ aim[0]+0.01f, aim[1]-0.01f, 0.001f, 0, 0, 1, 1 },
-	{ aim[0]-0.01f, aim[1]+0.01f, 0.001f, 0, 0, 1, 1 },
-	{ aim[0]+0.01f, aim[1]+0.01f, 0.001f, 0, 0, 1, 1 }
-	};
-
-	DWORD indices[6] =
-	{
-		0, 1, 2,
-		1, 2, 3
+	{ boxDimen[2], boxDimen[3], 0, setColor.r, setColor.g, setColor.b, setColor.a },
+	{ boxDimen[0], boxDimen[3], 0, setColor.r, setColor.g, setColor.b, setColor.a },
+	{ boxDimen[2], boxDimen[1], 0, setColor.r, setColor.g, setColor.b, setColor.a },
+	{ boxDimen[0], boxDimen[1], 0, setColor.r, setColor.g, setColor.b, setColor.a }
 	};
 
 	D3D11_MAPPED_SUBRESOURCE resource;
-	renderer.getDeviceContext()->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	ren.getDeviceContext()->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+
 	memcpy(resource.pData, vertices, sizeof(vertices));
-	renderer.getDeviceContext()->Unmap(m_pVertexBuffer, 0);
+	ren.getDeviceContext()->Unmap(m_pVertexBuffer, 0);
 
-	renderer.getDeviceContext()->Map(mIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-	memcpy(resource.pData, indices, sizeof(indices));
-	renderer.getDeviceContext()->Unmap(mIB, 0);
-
-}
-
-void Mouse::createMesh(Renderer& ren) {
-	// Create our vertext buffer
-	Vertex vertices[] = {
-	{ -0.01f, -0.01f, 0.001f, 1, 1, 1, 1 },
-	{ +0.01f, -0.01f, 0.001f, 1, 1, 1, 1 },
-	{ -0.01f, 0.01f, 0.001f, 1, 1, 1, 1 },
-	{ 0.01f, 0.01f, 0.001f, 1, 1, 1, 1 }
+	DWORD indices[6] =
+	{
+		2, 1, 0,
+		1, 2, 3
 	};
 
-	auto vertexBufferDesc = CD3D11_BUFFER_DESC(sizeof(Vertex)*4, D3D11_BIND_VERTEX_BUFFER);
+
+	ren.getDeviceContext()->Map(mIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	memcpy(resource.pData, indices, sizeof(indices));
+	ren.getDeviceContext()->Unmap(mIB, 0);
+}
+
+void BoxFactory::draw(Renderer& ren) {
+	auto deviceContext = ren.getDeviceContext();
+
+	// Bind our Player shaders
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Bind our vertex buffer
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+
+	deviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
+	deviceContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
+
+	// Draw
+	deviceContext->DrawIndexed(6, 0, 0);
+	
+}
+
+
+void BoxFactory::createMesh(Renderer& ren) {
+
+	// Create our vertext buffer
+	Vertex vertices[] = {
+	{ -0.90f, -0.90f, 0, 1, 1, 1, 0.4f },
+	{ 0.90f, -0.90f, 0, 1, 1, 1, 0.4f },
+	{ 0.90f, -0.50f, 0, 1, 1, 1, 0.4f },
+	{ -0.90f, -0.50f, 0, 1, 1, 1, 0.4f }
+	};
+	auto vertexBufferDesc = CD3D11_BUFFER_DESC(sizeof(vertices), D3D11_BIND_VERTEX_BUFFER);
 	vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	D3D11_SUBRESOURCE_DATA vertexData = { 0 };
 	vertexData.pSysMem = vertices;
+
 	ren.getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_pVertexBuffer);
 
-	// Create our indicies buffer becareful of back-face culling.
 	DWORD indices[6] =
 	{
 		2, 1, 0,
@@ -98,21 +116,4 @@ void Mouse::createMesh(Renderer& ren) {
 	// Create the index buffer.
 	ren.getDevice()->CreateBuffer(&ibd, &iinitData, &mIB);
 	ren.getDeviceContext()->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
-
-}
-
-void Mouse::draw(Renderer& ren) {
-	auto deviceContext = ren.getDeviceContext();
-
-	// Bind our Player shaders
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// Bind our vertex buffer
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-	deviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
-	//deviceContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
-
-	// Draw
-	deviceContext->DrawIndexed(6, 0, 0);
 }

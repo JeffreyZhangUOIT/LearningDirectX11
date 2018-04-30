@@ -16,28 +16,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
-#pragma once
-#include <wrl.h>
 
-class GameView {
+#include "TextGrabber.h"
 
-public:
-	GameView(int x);
-	~GameView();
-	void init();
-	void update(int sw, int sh, int mouseX, int mouseY);
-	float* getPos();
-	float* getAim();
-	void mouseDown(MSG * msg);
-	bool getMouse();
-	void setPos(float* pos);
+TextGrabber::TextGrabber() {
+	chapter = 0;
+	offset = 0;
+	command[256] = NULL;
+	parameter[1000] = NULL;
+}
+TextGrabber::~TextGrabber() {
+	if (fp) {
+		fclose(fp);
+	}
+}
 
-private:
-	void changeAim(int sw, int sh, int mouseX, int mouseY);
-	void changePos();
-	bool mDown = false;
-	float* m_pAim = nullptr;
-	float* m_pPos = nullptr;
-	float x, y, slope;
-	POINT cursorPos;
-};
+void TextGrabber::getNextCommand() {
+	if (chapter == 1) {
+		fopen_s(&fp, "Chapter1.txt", "r+");
+	}
+
+}
+int TextGrabber::execCommand() {
+
+}

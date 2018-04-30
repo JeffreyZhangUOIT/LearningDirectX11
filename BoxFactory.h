@@ -17,27 +17,22 @@ You should have received a copy of the GNU General Public License
 along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
-#include <wrl.h>
 
-class GameView {
+#include "Renderer.h"
 
+class BoxFactory {
 public:
-	GameView(int x);
-	~GameView();
-	void init();
-	void update(int sw, int sh, int mouseX, int mouseY);
-	float* getPos();
-	float* getAim();
-	void mouseDown(MSG * msg);
-	bool getMouse();
-	void setPos(float* pos);
+	struct color {
+		float r, g, b, a;
+	};
 
+	BoxFactory(Renderer& ren);
+	~BoxFactory();
+	void update(Renderer& ren, float* boxDimen, color setColor);
+	void draw(Renderer& ren);
 private:
-	void changeAim(int sw, int sh, int mouseX, int mouseY);
-	void changePos();
-	bool mDown = false;
-	float* m_pAim = nullptr;
-	float* m_pPos = nullptr;
-	float x, y, slope;
-	POINT cursorPos;
+	void createMesh(Renderer& ren);
+	ID3D11Buffer* m_pVertexBuffer = nullptr;
+	ID3D11Buffer* mIB = nullptr;
+	int flag[];
 };

@@ -17,27 +17,31 @@ You should have received a copy of the GNU General Public License
 along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
-#include <wrl.h>
 
-class GameView {
-
+#include <memory>
+#include "Audio.h"
+#include <random>
+class SoundManager {
 public:
-	GameView(int x);
-	~GameView();
-	void init();
-	void update(int sw, int sh, int mouseX, int mouseY);
-	float* getPos();
-	float* getAim();
-	void mouseDown(MSG * msg);
-	bool getMouse();
-	void setPos(float* pos);
+	SoundManager(float x);
+	~SoundManager();
+	void Update(int gamemode);
+	void Suspend();
+	void Resume();
+	void Reset();
+	float setVolume(float vol);
+	float changeVolume(float delta);
+
+	void OnNewAudioDevice() { m_retryAudio = true; }
 
 private:
-	void changeAim(int sw, int sh, int mouseX, int mouseY);
-	void changePos();
-	bool mDown = false;
-	float* m_pAim = nullptr;
-	float* m_pPos = nullptr;
-	float x, y, slope;
-	POINT cursorPos;
+	std::unique_ptr<DirectX::AudioEngine> m_audEngine;
+	bool m_retryAudio;
+	std::unique_ptr<DirectX::SoundEffect> m_Solitude;
+	std::unique_ptr<std::mt19937> m_random;
+	std::unique_ptr<DirectX::SoundEffectInstance> m_solitudeLoop;
+
+	float masterVolume;
+	float masterSlide;
+
 };

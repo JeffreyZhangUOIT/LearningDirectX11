@@ -1,3 +1,21 @@
+/*
+Copyright 2017, 2018 Jeffrey Zhang
+
+This file is part of ProjectFiasco.
+
+ProjectFiasco is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ProjectFiasco is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "Renderer.h"
 #include <fstream>
 
@@ -5,6 +23,7 @@
 
 
 Renderer::Renderer(Window& window) {
+
 	createDevice(window);
 	createRenderTarget();
 	createShader();
@@ -51,6 +70,18 @@ void Renderer::createDevice(Window& window) {
 		MessageBox(nullptr, "Problem creating DX11", "Error", MB_OK);
 		exit(0);
 	}
+	
+	DXGI_FORMAT depthBufferFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	CD3D11_TEXTURE2D_DESC depthStencilDesc(depthBufferFormat, window.w, window.h, 1, 1, D3D11_BIND_DEPTH_STENCIL);
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencil;
+	m_pDevice->CreateTexture2D(&depthStencilDesc, nullptr, depthStencil.GetAddressOf());
+
+	CD3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc(D3D11_DSV_DIMENSION_TEXTURE2D);
+	m_pDevice->CreateDepthStencilView(depthStencil.Get(), &depthStencilViewDesc, m_depthStencilView.ReleaseAndGetAddressOf());
+
+	
+	
 }
 
 void Renderer::createRenderTarget() {
@@ -94,7 +125,7 @@ void Renderer::beginFrame() {
 	m_pDeviceContext->OMSetRenderTargets(1, &m_pRenderTargetView, nullptr);
 
 	// Set viewport
-	auto viewport = CD3D11_VIEWPORT(0.f, 0.f, (float)m_pBackBufferdesc.Width, (float)m_pBackBufferdesc.Height);
+	viewport = CD3D11_VIEWPORT(0.f, 0.f, (float)m_pBackBufferdesc.Width, (float)m_pBackBufferdesc.Height);
 	m_pDeviceContext->RSSetViewports(1, &viewport);
 	m_pDeviceContext->IASetInputLayout(m_pInputLayout);
 	m_pDeviceContext->VSSetShader(m_pVertexShader, nullptr, 0);

@@ -1,3 +1,21 @@
+/*
+Copyright 2017, 2018 Jeffrey Zhang
+
+This file is part of ProjectFiasco.
+
+ProjectFiasco is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+ProjectFiasco is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "GameLogic.h"
 
 GameLogic::GameLogic(Renderer& ren) {
@@ -22,8 +40,8 @@ void GameLogic::spawnBullet(bool mDown, float* pos, float* aim,  Renderer& ren)
 
 }
 
-void GameLogic::updateTDS( Renderer& ren, float* pos) {
-
+void GameLogic::updateTDS(TextHandler& text, Renderer& ren, float* pos) {
+	spawnDelay++;
 	enemyConductor(ren, pos);
 	if (delay > 0) {
 		delay--;
@@ -68,7 +86,12 @@ void GameLogic::updateTDS( Renderer& ren, float* pos) {
 		}
 
 		if (it->EnemyHp <= 0) {
+			float * someboxPos = it->getPos();
+			DirectX::XMVECTORF32 white = { 1, 1, 1, 1 };
+
+			text.deathRattle(someboxPos[0], someboxPos[1], white);
 			it = boxes.erase(it);
+			deceasedEnemies++;
 		}
 		else {
 			it++;
@@ -85,7 +108,7 @@ void GameLogic::spawnBoxEnemy(float x, float y, Renderer& ren) {
 void GameLogic::initTDS(Renderer& ren) {
 	boxes.clear();
 	collection.clear();
-
+	deceasedEnemies = 0;
 
 	srand(static_cast <unsigned> (time(0)));
 
@@ -111,11 +134,16 @@ void GameLogic::enemyConductor(Renderer& ren, float* pos) {
 	float x, y;
 	x = (static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 2.6f))) - 1.3f;
 	y = (static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 2.6f))) - 1.3f;
-	if ((unsigned)boxes.size() < (unsigned)(difficulty * 4)) {
-		if (((fabs(x - pos[0]) > 0.3f) || (fabs(x - pos[0]) > 0.3f))) {
-			spawnBoxEnemy(x, y, ren);
+	timeScaledDifficulty = (30 - difficulty) - (deceasedEnemies / 2);
+	if (spawnDelay >= (4 - difficulty) * timeScaledDifficulty) {
+		if ((unsigned)boxes.size() < (unsigned)200) {
+			if (((fabs(y) > 1) || (fabs(x) > 1))) {
+				spawnDelay = 0;
+				spawnBoxEnemy(x, y, ren);
+			}
 		}
 	}
+	
 }
 
 void GameLogic::createMeshofBullets(Renderer& ren)
@@ -235,21 +263,22 @@ void GameLogic::createMeshofBoxEnemies(Renderer& ren)
 void GameLogic::drawBoxEnemies(Renderer& renderer, BoxEnemy::ArrVer vertices) {
 	auto deviceContext = renderer.getDeviceContext();
 
-	BoxEnemy::Vertex vertcies[4] = {
+	BoxEnemy::Vertex vertexBuffer[4] = {
 		vertices.vertices[0],
 		vertices.vertices[1],
 		vertices.vertices[2],
 		vertices.vertices[3],
 	};
 
+	// Setup vertex buffer.
 	D3D11_MAPPED_SUBRESOURCE resource;
 	assert(m_pVertexBuffer != NULL);
 	deviceContext->Map(m_pBoxEnemyVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 
-	memcpy(resource.pData, vertcies, sizeof(vertcies));
+	memcpy(resource.pData, vertexBuffer, sizeof(vertexBuffer));
 	deviceContext->Unmap(m_pBoxEnemyVertexBuffer, 0);
 
-	// Bind our Player shaders
+	// Setup topology
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Bind our vertex buffer
@@ -259,6 +288,29 @@ void GameLogic::drawBoxEnemies(Renderer& renderer, BoxEnemy::ArrVer vertices) {
 	deviceContext->IASetVertexBuffers(0, 1, &m_pBoxEnemyVertexBuffer, &stride, &offset);
 	deviceContext->IASetIndexBuffer(m_pBoxEnemyIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	// Draw
+	// Draw Box
 	deviceContext->DrawIndexed(6, 0, 0);
+
+	// Draw red hp bar background.
+	BoxEnemy::Vertex hpBackBuffer[4] = {
+		vertices.vertices[4],
+		vertices.vertices[5],
+		vertices.vertices[6],
+		vertices.vertices[7],
+	};
+
+	deviceContext->Map(m_pBoxEnemyVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	memcpy(resource.pData, hpBackBuffer, sizeof(hpBackBuffer));
+	deviceContext->Unmap(m_pBoxEnemyVertexBuffer, 0);
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	deviceContext->IASetVertexBuffers(0, 1, &m_pBoxEnemyVertexBuffer, &stride, &offset);
+	deviceContext->IASetIndexBuffer(m_pBoxEnemyIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	deviceContext->DrawIndexed(6, 0, 0);
+
+
+
+
+
+
+
 }

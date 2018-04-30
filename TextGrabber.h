@@ -17,27 +17,24 @@ You should have received a copy of the GNU General Public License
 along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
-#include <wrl.h>
+#include "SoundManager.h"
+#include "TextHandler.h"
+#include "BoxFactory.h"
+#include <stdio.h> 
 
-class GameView {
-
+class TextGrabber {
 public:
-	GameView(int x);
-	~GameView();
-	void init();
-	void update(int sw, int sh, int mouseX, int mouseY);
-	float* getPos();
-	float* getAim();
-	void mouseDown(MSG * msg);
-	bool getMouse();
-	void setPos(float* pos);
+	TextGrabber();
+	~TextGrabber();
+
+	void getNextCommand();
+	int execCommand();
 
 private:
-	void changeAim(int sw, int sh, int mouseX, int mouseY);
-	void changePos();
-	bool mDown = false;
-	float* m_pAim = nullptr;
-	float* m_pPos = nullptr;
-	float x, y, slope;
-	POINT cursorPos;
+	FILE * fp;
+	char command[256];
+	char parameter[1000];
+
+	int chapter;
+	int offset;
 };

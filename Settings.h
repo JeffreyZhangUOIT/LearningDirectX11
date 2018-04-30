@@ -16,28 +16,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #pragma once
-#include <wrl.h>
+#include <string>
+#include <stdio.h> 
+#include "SoundManager.h"
 
-class GameView {
-
+class Settings {
 public:
-	GameView(int x);
-	~GameView();
-	void init();
-	void update(int sw, int sh, int mouseX, int mouseY);
-	float* getPos();
-	float* getAim();
-	void mouseDown(MSG * msg);
-	bool getMouse();
-	void setPos(float* pos);
-
+	Settings(SoundManager& music);
+	~Settings();
+	void update(SoundManager& music, float vol);
+	void save(SoundManager& music);
 private:
-	void changeAim(int sw, int sh, int mouseX, int mouseY);
-	void changePos();
-	bool mDown = false;
-	float* m_pAim = nullptr;
-	float* m_pPos = nullptr;
-	float x, y, slope;
-	POINT cursorPos;
+	bool opened = false;
+	float masterVolume = 0.5f;
+	float someOtherParam = 3;
+	FILE * settings;
 };
+
+/*
+Some future settings: resolution, rebindable keys, text scaling. (other parts of UI already scales well with resolution).
+
+*/
+
