@@ -23,6 +23,7 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #include "Cursor.h"
 #include "BoxEnemy.h"
 #include "Bullet.h"
+#include "Timer.h"
 #include "TextHandler.h"
 #include <vector>
 #include <cstdlib>
@@ -35,11 +36,11 @@ public:
 	GameLogic(Renderer& ren);
 	~GameLogic();
 
-	void updateTDS(TextHandler& text, Renderer& ren, float* pos);
-	void initTDS(Renderer& ren);
-	void spawnBullet(bool mDown, float* pos, float* aim, Renderer& ren);
+	void updateTDS(TextHandler& text, Renderer& ren, float* pos, Timer& time);
+	void initTDS(Renderer& ren, Timer& time);
+	void spawnBullet(bool mDown, float* pos, float* aim, Renderer& ren, Timer& time);
 	std::vector<BoxEnemy> boxes;
-	void enemyConductor(Renderer& ren, float* pos);
+	void enemyConductor(Renderer& ren, float* pos, Timer& time);
 	void spawnBoxEnemy(float x, float y, Renderer& ren);
 	bool playerDamage();
 
@@ -56,9 +57,10 @@ private:
 	ID3D11Buffer* m_pBoxEnemyIndexBuffer = nullptr;
 
 	int difficulty = 2;
-	int delay = 0;
-	int spawnDelay = 0;
-	int timeScaledDifficulty = 15 - difficulty;
+	float deltaDT;
+	float delay = 0;
+	float timeSinceLastSpawn = 0;
+	float timeScaledDifficulty = 10;
 	int deceasedEnemies = 0;
 
 

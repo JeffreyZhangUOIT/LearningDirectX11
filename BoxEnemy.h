@@ -18,6 +18,7 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 #include "Renderer.h"
+#include "Timer.h"
 #include <DirectXMath.h>
 
 class BoxEnemy {
@@ -35,7 +36,7 @@ public:
 	BoxEnemy(float posx, float posy, Renderer& ren);
 	BoxEnemy(const BoxEnemy &b2);
 	~BoxEnemy();
-	ArrVer update(float* playerPos);
+	ArrVer update(float* playerPos, float time);
 	bool checkCollision();
 	int EnemyHp = 5;
 	float* getPos();
@@ -46,7 +47,6 @@ private:
 
 	ID3D11Buffer* m_pVertexBuffer = nullptr;
 	ID3D11Buffer* mIB = nullptr;
-
 	bool touch;
 
 	Vertex m_pVertices[4] = {

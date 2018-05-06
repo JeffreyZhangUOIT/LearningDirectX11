@@ -20,11 +20,12 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include "Renderer.h"
+#include "Timer.h"
 #include <DirectXMath.h>
 
 class Bullet {
 public:
-	Bullet(float* pos, Renderer& ren);  // Constructor
+	Bullet(float* pos, Renderer& ren, Timer& time);  // Constructor
 	Bullet(const Bullet &bul); // Copy constructor
 	~Bullet();
 
@@ -37,7 +38,7 @@ public:
 		struct Vertex vertices[4];
 	};
 
-	ArrVer update();
+	ArrVer update(float displacement);
 	void draw(Renderer& ren);
 	bool OOB = false;
 	float* getPos();
@@ -46,5 +47,6 @@ private:
 	void createMesh(Renderer& ren);
 	float x, y, dir;
 	float * point = nullptr;
-	
+
+
 };

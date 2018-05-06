@@ -22,6 +22,10 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #include "SpriteFont.h"
 #include "SimpleMath.h"
 #include "Renderer.h"
+#include "Timer.h"
+#include <time.h>
+#include <locale>
+#include <codecvt>
 #include <vector>
 
 class TextHandler {
@@ -30,14 +34,22 @@ public:
 	~TextHandler();
 	void drawMyText(const wchar_t* output, float x, float y, DirectX::XMVECTORF32 color);
 	void batchDraw(const wchar_t* output, float x, float y, float rotate, DirectX::XMVECTORF32 color);
+	void drawDialog(char name[256], char parameters[1000], DirectX::XMVECTORF32 color);
 	void deathRattle( float x, float y, DirectX::XMVECTORF32 color);
-	void grabNextLine();
-	void displayNextLine();
+	void tempMessage(float x, float y, const wchar_t* output, DirectX::XMVECTORF32 color);
+	char * randomSchoolName();
+	void resetMyTime();
+	void setMCName(char * name);
 	void update();
-
-	std::unique_ptr<DirectX::SpriteFont> cabri32;
+	double charPerSec;
+	char mcName[256] = "Anon ";
+	char schoolName[256] = "Dud High ";
 
 private:
+	Timer timer;
+	int sizeofabuffer;
+	
+
 	int screenWidth, screenHeight;
 	const wchar_t* randomTextGen();
 	DirectX::SimpleMath::Vector2 m_fontPos;
@@ -51,4 +63,12 @@ private:
 	};
 
 	std::vector<textObjs> timedText;
+
+	DirectX::XMVECTORF32 black = { 0, 0, 0, 1 };
+	DirectX::XMVECTORF32 red = { 1, 0, 0, 1 };
+	std::unique_ptr<DirectX::SpriteFont> cabri32;
+	std::unique_ptr<DirectX::SpriteFont> bellmt16;
+	std::unique_ptr<DirectX::SpriteFont> vinerHand16;
+	std::unique_ptr<DirectX::SpriteFont> bellmt24;
+	std::unique_ptr<DirectX::SpriteFont> vinerHand32;
 };

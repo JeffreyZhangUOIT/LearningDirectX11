@@ -18,6 +18,7 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 #include "Renderer.h"
+#include "Timer.h"
 
 class Player {
 public:

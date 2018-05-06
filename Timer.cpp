@@ -23,6 +23,10 @@ void Timer::resetTime() {
 	startTime = clock();
 }
 
-unsigned long Timer::elapsedTime() {
-	return ((unsigned long)clock() - startTime) / CLOCKS_PER_SEC;
+double Timer::elapsedTime() {
+	return ((double)clock() - startTime) / CLOCKS_PER_SEC;
+}
+
+float Timer::deltaFT() {
+	return ((float)clock() - startTime) / CLOCKS_PER_SEC;
 }

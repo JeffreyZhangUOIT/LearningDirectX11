@@ -18,7 +18,7 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Bullet.h"
 
-Bullet::Bullet(float* pos, Renderer& ren) 
+Bullet::Bullet(float* pos, Renderer& ren, Timer& time) 
 {
 	x = pos[0];
 	y = pos[1];
@@ -28,10 +28,7 @@ Bullet::Bullet(float* pos, Renderer& ren)
 	dir = pos[2];
 
 	// Move the bullet out of the player, without drawing it. Helps make it seem like it's coming out of the right place.
-	update();
-	update();
-	update();
-	
+	update(0.05f);
 }
 
 Bullet::Bullet(const Bullet &bul) {
@@ -50,36 +47,43 @@ Bullet::~Bullet()
 
 }
 
-Bullet::ArrVer Bullet::update()
+Bullet::ArrVer Bullet::update(float displacement)
 {
+	// Weird teleporting behavior.  (0.9f * deltaTime)
 	OOB = false;
+	
 	if ((dir > 0) & (dir < 0.5f* 3.14f)) {
-		y += 0.03f * cosf(fabs(dir));
+		y += (0.6f * displacement) * cosf(fabs(dir));
 	}
 	if (dir > 0.5f*3.14) {
-		y -= 0.03f * -cosf(fabs(dir));
+		y -= (0.6f * displacement) * -cosf(fabs(dir));
 	}
 	if ((dir < 0) & (dir > -0.5f*3.14)) {
-		y += 0.03f * cosf(fabs(dir));
+		y += (0.6f * displacement) * cosf(fabs(dir));
 	}
 	if (dir < -0.5f*3.14) {
-		y -= 0.03f * -cosf(fabs(dir));
+		y -= (0.6f * displacement) * -cosf(fabs(dir));
 	}
 	if ((dir > 0) & (dir < 0.5f* 3.14f)) {
-		x += 0.03f * sinf(fabs(dir));
+		x += (0.6f * displacement) * sinf(fabs(dir));
 	}
 	if (dir > 0.5f*3.14) {
-		x += 0.03f * sinf(fabs(dir));
+		x += (0.6f * displacement) * sinf(fabs(dir));
 	}
-	if ((dir < 0) & (dir > -0.5f*3.14)){
-		x -= 0.03f * sinf(fabs(dir));
+	if ((dir < 0) & (dir > -0.5f*3.14)) {
+		x -= (0.6f * displacement) * sinf(fabs(dir));
 	}
 	if (dir < -0.5f*3.14) {
-		x -= 0.03f * sinf(fabs(dir));
+		x -= (0.6f * displacement) * sinf(fabs(dir));
+	}
+	if (dir == 0) {
+		y += 0.03f;
 	}
 	if (fabs(x) > 1.2f || fabs(y) > 1.2f) {
 		OOB = true;
 	}
+
+	
 
 	DirectX::XMFLOAT4 p1, p2, p3, p4;
 	DirectX::XMVECTOR scale = DirectX::XMVectorSet(1, 1, 1, 0);
@@ -111,6 +115,7 @@ Bullet::ArrVer Bullet::update()
 	newVertices.vertices[2] = { p3.x, p3.y, 0, 1, 0.7176f, 0.1176f, 1 };
 	newVertices.vertices[3] = { p4.x, p4.y, 0, 1, 0.7176f, 0.1176f, 1 };
 
+	
 	return newVertices;
 }
 
@@ -130,81 +135,3 @@ float * Bullet::getPos()
 		return point;
 	}
 }
-
-/*
-{
-{ p1.x, p1.y, 0, 1, 0.7176f, 0.1176f, 1 },
-{ p2.x, p2.y, 0, 1, 0.7176f, 0.1176f, 1 },
-{ p3.x, p3.y, 0, 1, 0.7176f, 0.1176f, 1 },
-{ p4.x, p4.y, 0, 1, 0.7176f, 0.1176f, 1 }
-}
-void Bullet::draw(Renderer& renderer) 
-{
-	auto deviceContext = renderer.getDeviceContext();
-
-	if (m_pVertexBuffer == nullptr) {
-		createMesh(renderer);
-	}
-
-	// Update vertex and pixel buffers
-	D3D11_MAPPED_SUBRESOURCE resource;
-	if (!m_pVertexBuffer) {
-		createMesh(renderer);
-	}
-
-	deviceContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-
-	memcpy(resource.pData, m_pVertices, sizeof(m_pVertices));
-	deviceContext->Unmap(m_pVertexBuffer, 0);
-
-
-	deviceContext->Map(mIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-	memcpy(resource.pData, m_pIndices, sizeof(m_pIndices));
-	deviceContext->Unmap(mIB, 0);
-
-
-	// Bind our Player shaders
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// Bind our vertex buffer
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-
-	deviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
-	deviceContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
-
-	// Draw
-	deviceContext->DrawIndexed(6, 0, 0);
-
-}
-
-
-void Bullet::createMesh(Renderer& ren)
-{
-// Create our vertext buffer
-auto vertexBufferDesc = CD3D11_BUFFER_DESC(sizeof(m_pVertices), D3D11_BIND_VERTEX_BUFFER);
-vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-D3D11_SUBRESOURCE_DATA vertexData = { 0 };
-vertexData.pSysMem = m_pVertices;
-
-ren.getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_pVertexBuffer);
-
-
-D3D11_BUFFER_DESC ibd;
-ibd.Usage = D3D11_USAGE_DYNAMIC;
-ibd.ByteWidth = sizeof(DWORD) * 6;
-ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-ibd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-ibd.MiscFlags = 0;
-ibd.StructureByteStride = 0;
-
-// Specify the data to initialize the index buffer.
-D3D11_SUBRESOURCE_DATA iinitData;
-iinitData.pSysMem = m_pIndices;
-
-// Create the index buffer.
-ren.getDevice()->CreateBuffer(&ibd, &iinitData, &mIB);
-ren.getDeviceContext()->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
-}
-*/

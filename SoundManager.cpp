@@ -64,10 +64,10 @@ void SoundManager::Update(int gamemode) {
 		}
 	}
 	m_solitudeLoop->SetVolume(masterVolume);
-	if (gamemode == 0) {
+	if (gamemode == 1) {
 		m_solitudeLoop->Play();
 	}
-	if (gamemode == 1) {
+	if (gamemode == 0) {
 		m_solitudeLoop->Stop();
 	}
 	if (gamemode == 2) {

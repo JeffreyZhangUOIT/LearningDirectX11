@@ -18,6 +18,7 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 #include <wrl.h>
+#include "Timer.h"
 
 class GameView {
 
@@ -25,19 +26,21 @@ public:
 	GameView(int x);
 	~GameView();
 	void init();
-	void update(int sw, int sh, int mouseX, int mouseY);
+	void update(int sw, int sh, int mouseX, int mouseY, Timer& time);
 	float* getPos();
 	float* getAim();
 	void mouseDown(MSG * msg);
 	bool getMouse();
 	void setPos(float* pos);
+	void changePos(Timer& time);
 
 private:
 	void changeAim(int sw, int sh, int mouseX, int mouseY);
-	void changePos();
+	
 	bool mDown = false;
 	float* m_pAim = nullptr;
 	float* m_pPos = nullptr;
 	float x, y, slope;
+	float deltaTime;
 	POINT cursorPos;
 };

@@ -24,6 +24,7 @@ BoxEnemy::BoxEnemy(float posx, float posy, Renderer& ren) {
 	EnemyHp = 3;
 	touch = false;
 	slope = 0;
+
 }
 
 BoxEnemy::BoxEnemy(const BoxEnemy &b2) {
@@ -52,23 +53,23 @@ float* BoxEnemy::getPos()
 	float point[2] = { x, y };
 	return point;
 }
-BoxEnemy::ArrVer BoxEnemy::update(float* playerPos) {
+BoxEnemy::ArrVer BoxEnemy::update(float* playerPos, float displacement) {
 	float hpPercent = (EnemyHp / 5.0f);
 	slope = atan2((playerPos[0] - x), (playerPos[1] - y));
-
+	
 	if ((x - playerPos[0]) > 0) {
-		x -= 0.005f;
+		x -= (0.07f * displacement);
 	}
 	if ((x - playerPos[0]) < 0) {
-		x += 0.005f;
+		x += (0.07f * displacement);
 	}
 	if ((y - playerPos[1]) > 0) {
-		y -= 0.005f;
+		y -= (0.07f * displacement);
 	}
 	if ((y - playerPos[1]) < 0) {
-		y += 0.005f;
+		y += (0.07f * displacement);
 	}
-	
+
 	if ((fabs(y - playerPos[1]) < 0.13f) && (fabs(x - playerPos[0]) < 0.13f)) 
 	{
 		touch = true;

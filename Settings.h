@@ -21,17 +21,20 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <stdio.h> 
 #include "SoundManager.h"
+#include "TextHandler.h"
 
 class Settings {
 public:
-	Settings(SoundManager& music);
+	Settings(SoundManager& music, TextHandler& text);
 	~Settings();
-	void update(SoundManager& music, float vol);
+	void updateMasterVol(SoundManager& music, float vol);
+	void updateCharPerSec(TextHandler& text, double cps);
 	void save(SoundManager& music);
 private:
 	bool opened = false;
 	float masterVolume = 0.5f;
 	float someOtherParam = 3;
+	double charPerSec = 50;
 	FILE * settings;
 };
 

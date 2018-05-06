@@ -23,19 +23,32 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #include "BoxFactory.h"
 #include <stdio.h> 
 
+
 class TextGrabber {
 public:
-	TextGrabber();
+	TextGrabber(int ch);
 	~TextGrabber();
-
+	int chapter;
+	int offset;
+	void loadTheChapter();
+	void minigameReturn(char* nextScene);
 	void getNextCommand();
-	int execCommand();
+	int execCommand(SoundManager& sounds, TextHandler& drawText);
+	void setChOff(int ch, int off);
 
 private:
 	FILE * fp;
 	char command[256];
-	char parameter[1000];
+	char parameters[1000];
+	char buffer[1256];
+	char* token;
+	char* nextTok;
+	bool firstInstance;
+	int indexedLines[3000];
+	int indexedScenes[100];
 
-	int chapter;
-	int offset;
+	int eofPos;
+
+	DirectX::XMVECTORF32 red = { 1, 0, 0, 1 };
+
 };

@@ -24,7 +24,7 @@ GameView::GameView(int ax){
 	init();
 	m_pAim[0] = 0;
 	m_pAim[1] = 0;
-
+	deltaTime = 0;
 }
 
 GameView::~GameView() {
@@ -32,10 +32,10 @@ GameView::~GameView() {
 	delete m_pPos;
 }
 
-void GameView::update(int sw, int sh, int mouseX, int mouseY) {
+void GameView::update(int sw, int sh, int mouseX, int mouseY, Timer& time) {
 	mDown = false;
 	changeAim(sw, sh, mouseX, mouseY);
-	changePos();
+	changePos(time);
 }
 
 void GameView::setPos(float* pos) {
@@ -92,26 +92,24 @@ void GameView::changeAim(int sw, int sh, int mouseX, int mouseY) {
 	if (m_pAim[1] > 1) {
 		m_pAim[1] = 1;
 	}
-	
-
 }
 
-void GameView::changePos() {
+void GameView::changePos(Timer& time) {
 	slope = atan2((m_pAim[0] - x), (m_pAim[1] - y));
-
+	deltaTime = time.deltaFT() - deltaTime;
 	if (GetAsyncKeyState(0x57)) {
-		y += 0.01f;
+		y += (0.7f * deltaTime);
 	}
 	if (GetAsyncKeyState(0x53)) {
-		y -= 0.01f;
+		y -= (0.7f * deltaTime);
 	}
 	if (GetAsyncKeyState(0x44)) {
-		x += 0.01f;
+		x += (0.7f * deltaTime);
 	}
 	if (GetAsyncKeyState(0x41)) {
-		x -= 0.01f;
+		x -= (0.7f * deltaTime);
 	}
-
+	deltaTime = time.deltaFT();
 	if (x < -1.15f) {
 		x = 1.1f;
 	}

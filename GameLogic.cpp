@@ -19,7 +19,6 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #include "GameLogic.h"
 
 GameLogic::GameLogic(Renderer& ren) {
-	initTDS(ren);
 	createMeshofBullets(ren);
 	createMeshofBoxEnemies(ren);
 }
@@ -29,28 +28,28 @@ GameLogic::~GameLogic() {
 	boxes.clear();
 }
 
-void GameLogic::spawnBullet(bool mDown, float* pos, float* aim,  Renderer& ren)
+void GameLogic::spawnBullet(bool mDown, float* pos, float* aim, Renderer& ren, Timer& time)
 {
-	if (((GetKeyState(VK_LBUTTON) & 0x80) != 0) & (delay <= 0))
-	{
-		collection.emplace_back(pos, ren);
-		delay = 3;
-		
+	if (((GetKeyState(VK_LBUTTON) & 0x80) != 0) & (delay <= 0)){
+		collection.emplace_back(pos, ren, time);
+		delay = 0.1f;
 	}
-
 }
 
-void GameLogic::updateTDS(TextHandler& text, Renderer& ren, float* pos) {
-	spawnDelay++;
-	enemyConductor(ren, pos);
-	if (delay > 0) {
-		delay--;
+void GameLogic::updateTDS(TextHandler& text, Renderer& ren, float* pos, Timer& time) {
+	deltaDT = time.deltaFT() - deltaDT;
+	if (deltaDT < 0.05f) {
+		deltaDT = 0.05f;
 	}
+	timeSinceLastSpawn += (10 * deltaDT);
+	delay -= deltaDT;
+	enemyConductor(ren, pos, time);
+	
 
 	for (std::vector<Bullet>::iterator bul = collection.begin(); bul != collection.end();)
 	{
 		// For each bullet, update and draw it.
-		drawBullets(ren, bul->update());
+		drawBullets(ren, bul->update(deltaDT));
 
 		bool outOfBounds = false;
 		outOfBounds = bul->OOB;
@@ -69,7 +68,7 @@ void GameLogic::updateTDS(TextHandler& text, Renderer& ren, float* pos) {
 	for (std::vector<BoxEnemy>::iterator it = boxes.begin(); it != boxes.end();)
 	{
 		// For each box enemy, update and draw it.
-		drawBoxEnemies(ren, it->update(pos));
+		drawBoxEnemies(ren, it->update(pos, deltaDT));
 		for (std::vector<Bullet>::iterator bul = collection.begin(); bul != collection.end();)
 		{
 			float * bPos = bul->getPos();
@@ -97,6 +96,7 @@ void GameLogic::updateTDS(TextHandler& text, Renderer& ren, float* pos) {
 			it++;
 		}
 	}
+	deltaDT = time.deltaFT();
 }
 
 
@@ -105,13 +105,12 @@ void GameLogic::spawnBoxEnemy(float x, float y, Renderer& ren) {
 	
 }
 
-void GameLogic::initTDS(Renderer& ren) {
+void GameLogic::initTDS(Renderer& ren, Timer& timer) {
 	boxes.clear();
 	collection.clear();
 	deceasedEnemies = 0;
-
-	srand(static_cast <unsigned> (time(0)));
-
+	srand(time(NULL));
+	timer.resetTime();
 }
 
 bool GameLogic::playerDamage() {
@@ -130,15 +129,15 @@ bool GameLogic::playerDamage() {
 	return false;
 }
 
-void GameLogic::enemyConductor(Renderer& ren, float* pos) {
+void GameLogic::enemyConductor(Renderer& ren, float* pos, Timer& time) {
 	float x, y;
 	x = (static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 2.6f))) - 1.3f;
 	y = (static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 2.6f))) - 1.3f;
-	timeScaledDifficulty = (30 - difficulty) - (deceasedEnemies / 2);
-	if (spawnDelay >= (4 - difficulty) * timeScaledDifficulty) {
-		if ((unsigned)boxes.size() < (unsigned)200) {
+	timeScaledDifficulty = (30 - (time.elapsedTime() * 0.5)) / (difficulty) ;
+	if (timeSinceLastSpawn >=  timeScaledDifficulty){
+		if (boxes.size() < 200) {
 			if (((fabs(y) > 1) || (fabs(x) > 1))) {
-				spawnDelay = 0;
+				timeSinceLastSpawn = 0;
 				spawnBoxEnemy(x, y, ren);
 			}
 		}

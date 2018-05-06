@@ -20,7 +20,7 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #include "Settings.h"
 using namespace std;
 
-Settings::Settings(SoundManager& music) {
+Settings::Settings(SoundManager& music, TextHandler& text) {
 	fopen_s(&settings, "settings.txt", "r+");
 	if (settings == NULL) {
 		fopen_s(&settings, "settings.txt", "w+");
@@ -31,16 +31,22 @@ Settings::Settings(SoundManager& music) {
 		char * nextTok = NULL;
 
 		while (fgets(buffer, 256, settings) != NULL) {
-
 			token = strtok_s(buffer, "=\n", &nextTok);
-	
-			if (strncmp(token, "MasterVolume", strlen("MasterVolume")) == 0) {
+			while (token != NULL) {
+				if (strncmp(token, "SomeOtherParam", strlen("SomeOtherParam")) == 0) {
+					token = strtok_s(NULL, "=\n", &nextTok);
+					someOtherParam = stof(token);
+				}
+				if (strncmp(token, "MasterVolume", strlen("MasterVolume")) == 0) {
+					token = strtok_s(NULL, "=\n", &nextTok);
+					masterVolume = stof(token);
+				}
+				if (strncmp(token, "charPerSec", strlen("charPerSec")) == 0) {
+					token = strtok_s(NULL, "=\n", &nextTok);
+					charPerSec = stof(token);
+				}
+				
 				token = strtok_s(NULL, "=\n", &nextTok);
-				masterVolume = stof(token);
-			}
-			if (strncmp(token, "SomeOtherParam", strlen("SomeOtherParam")) == 0) {
-				token = strtok_s(NULL, "=\n", &nextTok);
-				someOtherParam = stof(token);
 			}
 		}
 	}
@@ -51,19 +57,24 @@ Settings::Settings(SoundManager& music) {
 		fclose(settings);
 	}
 	
-	update(music, masterVolume);
+	updateMasterVol(music, masterVolume);
+	updateCharPerSec(text, charPerSec);
 }
 
 Settings::~Settings() {
 	if (settings) {
 		fclose(settings);
 	}
-	
 }
 
-void Settings::update(SoundManager& music, float vol) {
+void Settings::updateMasterVol(SoundManager& music, float vol) {
 	masterVolume = vol;
 	music.setVolume(masterVolume);
+}
+
+void Settings::updateCharPerSec(TextHandler& text, double cps) {
+	charPerSec = cps;
+	text.charPerSec = charPerSec;
 }
 
 void Settings::save(SoundManager& music) {
@@ -75,6 +86,11 @@ void Settings::save(SoundManager& music) {
 
 	strcpy_s(buf, sizeof(buf), "MasterVolume=");
 	sprintf_s(temp, sizeof(temp), "%.2f", masterVolume);
+	strcat_s(buf, 256, temp);
+	fprintf(settings, "%s\n", buf);
+
+	strcpy_s(buf, sizeof(buf), "charPerSec=");
+	sprintf_s(temp, sizeof(temp), "%.2f", charPerSec);
 	strcat_s(buf, 256, temp);
 	fprintf(settings, "%s\n", buf);
 

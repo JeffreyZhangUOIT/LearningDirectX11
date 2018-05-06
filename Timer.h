@@ -22,8 +22,8 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 class Timer {
 public:
 	void resetTime();
-	unsigned long elapsedTime();
+	double elapsedTime();
+	float deltaFT();
 private:
 	unsigned long startTime;
-	unsigned long deltaTime;
 };

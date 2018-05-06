@@ -171,6 +171,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SaveManager.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="TextGrabber.cpp" />
@@ -188,6 +189,7 @@
     <ClInclude Include="GameView.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SaveManager.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="TextGrabber.h" />
@@ -219,6 +221,9 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="modSolitude.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Chapter1.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
