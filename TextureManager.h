@@ -37,96 +37,45 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTIO
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#include "SoundManager.h"
-using namespace DirectX;
+#pragma once
 
+#include "Renderer.h"
+#include "DDSTextureLoader.h"
+#include "SimpleMath.h"
+#include "Effects.h"
 
-SoundManager::SoundManager(float x) {
-	AUDIO_ENGINE_FLAGS eflags = AudioEngine_Default;
-	#ifdef _DEBUG
-		eflags = eflags | AudioEngine_Debug;
-	#endif
-	m_audEngine = std::make_unique<AudioEngine>(eflags);
-	m_retryAudio = false;
-	m_Solitude = std::make_unique<SoundEffect>(m_audEngine.get(), L"modSolitude.wav");
-	std::random_device rd;
-	m_random = std::make_unique<std::mt19937>(rd());
+class TextureManager
+{
 
-	m_solitudeLoop = m_Solitude->CreateInstance();
-	masterVolume = x;
-}
+public:
+	TextureManager(Renderer& ren);
+	~TextureManager();
+	void changeTex(Renderer& ren, int n);
 
-SoundManager::~SoundManager() {
-	if (m_audEngine)
-	{
-		m_audEngine->Suspend();
-	}
-
-	m_solitudeLoop.reset();
-}
-
-void SoundManager::Update(int gamemode) {
-	if (m_retryAudio)
-	{
-		m_retryAudio = false;
-
-		if (m_audEngine->Reset())
-		{
-			// TODO: restart any looped sounds here
-			if (m_solitudeLoop)
-				m_solitudeLoop->Play(true);
-		}
-	}
-	else if (!m_audEngine->Update())
-	{
-		if (m_audEngine->IsCriticalError())
-		{
-			m_retryAudio = true;
-		}
-	}
-	m_solitudeLoop->SetVolume(masterVolume);
-	if (gamemode == 1) {
-		m_solitudeLoop->Play();
-	}
-	if (gamemode == 0) {
-		m_solitudeLoop->Stop();
-	}
-	if (gamemode == 2) {
-		m_solitudeLoop->Play();
-	}
-	
-}
-
-void SoundManager::Suspend() {
-	m_audEngine->Suspend();
-}
-
-void SoundManager::Resume() {
-	m_audEngine->Resume();
-}
-
-void SoundManager::Reset() {
-	m_retryAudio = true;
-}
-
-float SoundManager::setVolume(float vol) {
-	if (vol > 1) {
-		vol = 1;
-	}
-	if (vol < 0) {
-		vol = 0;
-	}
-	masterVolume = vol;
-	return masterVolume;
-}
-
-float SoundManager::changeVolume(float delta) {
-	masterVolume += delta;
-	if (masterVolume > 1) {
-		masterVolume = 1.0f;
-	}
-	if (masterVolume < 0) {
-		masterVolume = 0.0f;
-	}
-	return masterVolume;
-}
+private:
+	//std::unique_ptr<DirectX::EnvironmentMapEffect> m_effect;
+	ID3D11ShaderResourceView * swordTextureSRV;
+	ID3D11ShaderResourceView * assortedVehiclesSRV;
+	ID3D11ShaderResourceView * whiteTexSRV;
+	ID3D11ShaderResourceView * burgerTexSRV;
+	ID3D11ShaderResourceView * redTexSRV;
+	ID3D11ShaderResourceView * blackTexSRV;
+	ID3D11ShaderResourceView * racingMap1SRV;
+	ID3D11ShaderResourceView * racingMap2SRV;
+	ID3D11ShaderResourceView * injuredSwordSRV;
+	ID3D11ShaderResourceView * mc_car;
+	ID3D11ShaderResourceView * tiles;
+	ID3D11ShaderResourceView * Match3Board;
+	ID3D11ShaderResourceView * projectile;
+	ID3D11ShaderResourceView * mc_heart;
+	ID3D11ShaderResourceView * characters1;
+	ID3D11ShaderResourceView * characters2;
+	ID3D11ShaderResourceView * backgrounds;
+	ID3D11ShaderResourceView * pacmanBackground;
+	ID3D11ShaderResourceView * textBox;
+	ID3D11ShaderResourceView * optionBox;
+	ID3D11ShaderResourceView * pacEntities;
+	ID3D11ShaderResourceView * fadeToBlack;
+	ID3D11ShaderResourceView * progressBar;
+	ID3D11ShaderResourceView * progressIcon;
+};

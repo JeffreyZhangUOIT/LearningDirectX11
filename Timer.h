@@ -25,5 +25,5 @@ public:
 	double elapsedTime();
 	float deltaFT();
 private:
-	unsigned long startTime;
+	clock_t startTime;
 };

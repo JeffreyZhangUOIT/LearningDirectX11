@@ -55,10 +55,10 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #include <memory>
 #include <stdexcept>
 #include <Dbt.h>
-
 class Window {
 public:
 	Window(int width, int height);
+	void ResizeWindow(int width, int height);
 	int w;
 	int h;
 	bool resetAudio = false;

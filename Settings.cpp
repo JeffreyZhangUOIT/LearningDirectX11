@@ -20,7 +20,7 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #include "Settings.h"
 using namespace std;
 
-Settings::Settings(SoundManager& music, TextHandler& text) {
+Settings::Settings(int i) {
 	fopen_s(&settings, "settings.txt", "r+");
 	if (settings == NULL) {
 		fopen_s(&settings, "settings.txt", "w+");
@@ -45,7 +45,10 @@ Settings::Settings(SoundManager& music, TextHandler& text) {
 					token = strtok_s(NULL, "=\n", &nextTok);
 					charPerSec = stof(token);
 				}
-				
+				if (strncmp(token, "Resolution", strlen("Resolution")) == 0) {
+					token = strtok_s(NULL, "=\n", &nextTok);
+					memcpy(resolution, token, strlen(token));
+				}
 				token = strtok_s(NULL, "=\n", &nextTok);
 			}
 		}
@@ -56,15 +59,18 @@ Settings::Settings(SoundManager& music, TextHandler& text) {
 	if (settings) {
 		fclose(settings);
 	}
-	
-	updateMasterVol(music, masterVolume);
-	updateCharPerSec(text, charPerSec);
 }
 
 Settings::~Settings() {
 	if (settings) {
 		fclose(settings);
 	}
+}
+
+void Settings::init(SoundManager& music, TextHandler& text)
+{
+	updateMasterVol(music, masterVolume);
+	updateCharPerSec(text, charPerSec);
 }
 
 void Settings::updateMasterVol(SoundManager& music, float vol) {
@@ -94,11 +100,11 @@ void Settings::save(SoundManager& music) {
 	strcat_s(buf, 256, temp);
 	fprintf(settings, "%s\n", buf);
 
-	strcpy_s(buf, sizeof(buf), "SomeOtherParam=72");
+	strcpy_s(buf, sizeof(buf), "Resolution=");
+	strcat_s(buf, sizeof(buf), resolution);
 	fprintf(settings, "%s\n", buf);
 	fclose(settings);
-	//strcat_s(buf, temp);
-	
-
-	//update(music, masterVolume);
 }
+
+
+

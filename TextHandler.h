@@ -15,6 +15,27 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
+
+The MIT License (MIT)
+
+Copyright (c) 2018 Microsoft Corp
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be included in all copies
+or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #pragma once
 
@@ -36,7 +57,7 @@ public:
 	void batchDraw(const wchar_t* output, float x, float y, float rotate, DirectX::XMVECTORF32 color);
 	void drawDialog(char name[256], char parameters[1000], DirectX::XMVECTORF32 color);
 	void deathRattle( float x, float y, DirectX::XMVECTORF32 color);
-	void tempMessage(float x, float y, const wchar_t* output, DirectX::XMVECTORF32 color);
+	void tempMessage(int timeToLive, float x, float y, const wchar_t* output, DirectX::XMVECTORF32 color);
 	char * randomSchoolName();
 	void resetMyTime();
 	void setMCName(char * name);
@@ -66,9 +87,17 @@ private:
 
 	DirectX::XMVECTORF32 black = { 0, 0, 0, 1 };
 	DirectX::XMVECTORF32 red = { 1, 0, 0, 1 };
+	DirectX::XMVECTORF32 pansy = { 72 / 255.0f, 221 / 255.0f, 136 / 255.0f, 1 };
+	
 	std::unique_ptr<DirectX::SpriteFont> cabri32;
-	std::unique_ptr<DirectX::SpriteFont> bellmt16;
+	
 	std::unique_ptr<DirectX::SpriteFont> vinerHand16;
+	std::unique_ptr<DirectX::SpriteFont> bellmt16;
+	std::unique_ptr<DirectX::SpriteFont> bellmt18;
+	std::unique_ptr<DirectX::SpriteFont> bellmt20;
+	std::unique_ptr<DirectX::SpriteFont> bellmt22;
 	std::unique_ptr<DirectX::SpriteFont> bellmt24;
 	std::unique_ptr<DirectX::SpriteFont> vinerHand32;
+	std::unique_ptr<DirectX::SpriteFont> stencil30;
+	
 };

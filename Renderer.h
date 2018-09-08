@@ -21,31 +21,43 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #include <d3d11.h>
 #include <memory>
 #include <DXGI.h>
+#include <unordered_map>
 #include <wrl/client.h>
 #include <DirectXMath.h>
 
 class Renderer {
 public:
+	
+	struct Vertex {
+		float x, y, z;
+		float Xtex, Ytex;
+	};
+
+	struct SquareObj {
+		Vertex vertices[4];
+	};
+
 	Renderer(Window& window);
 	~Renderer();
 	void beginFrame();
+	
 	void endFrame();
 	CD3D11_VIEWPORT viewport;
 	IDXGISwapChain* getSwapChain();
-
-	Microsoft::WRL::ComPtr<ID3D11Device1>           m_d3dDevice;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext1>    m_d3dContext;
 	ID3D11Device* getDevice();
 	ID3D11DeviceContext* getDeviceContext();
 	D3D11_TEXTURE2D_DESC m_pBackBufferdesc;
 	void createShader();
+	void moveCamera(DirectX::XMFLOAT4 eye, DirectX::XMFLOAT4 at, DirectX::XMFLOAT4 up);
+	void resizeScreen(Window& window);
 	bool fullscreen = false;
+	void resetFrame();
 
 private:
-	
-	void createDX10Device(Window& window);
+
 	void createDevice(Window& window);
 	void createRenderTarget();
+
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depthStencilView;
 
 	// Device stuff
@@ -61,7 +73,23 @@ private:
 	ID3D11PixelShader* m_pPixelShader = nullptr;
 	ID3D11InputLayout* m_pInputLayout = nullptr;
 
+	/*
+	ID3D11Buffer* m_VertexBuffer1 = nullptr;
+	ID3D11Buffer* m_IndexBuffer1 = nullptr;
+	// public
+	void appendVertexBuffers(Renderer::Vertex vert);
+	void appendIndexBuffers(DWORD idx, bool endOfObj);
+	void updateIndicies();
+	void draw();
 
+	int vertOffset, idxOffset;
+	int idxOfObj;
+	float * vertexBuf;
+	DWORD * indexBuf;
+	float vbuf[3997];
+	DWORD ibuf[571];
+	*/
+	
 	struct ConstantBuffer
 	{
 		DirectX::XMMATRIX mWorld;

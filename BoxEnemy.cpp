@@ -18,7 +18,7 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "BoxEnemy.h"
 
-BoxEnemy::BoxEnemy(float posx, float posy, Renderer& ren) {
+BoxEnemy::BoxEnemy(float posx, float posy) {
 	x = posx;
 	y = posy;
 	EnemyHp = 3;
@@ -35,7 +35,7 @@ BoxEnemy::BoxEnemy(const BoxEnemy &b2) {
 	slope = b2.slope;
 }
 
-bool BoxEnemy::bulletCollision(float* pos) 
+bool BoxEnemy::bulletCollision(float* pos)
 {
 	if ((fabs(y - pos[1]) < 0.05f) && (fabs(x - pos[0]) < 0.05f))
 	{
@@ -48,29 +48,64 @@ bool BoxEnemy::bulletCollision(float* pos)
 BoxEnemy::~BoxEnemy() {
 
 }
-float* BoxEnemy::getPos() 
+float* BoxEnemy::getPos()
 {
-	float point[2] = { x, y };
+	point[0] = x;
+	point[1] = y;
 	return point;
 }
 BoxEnemy::ArrVer BoxEnemy::update(float* playerPos, float displacement) {
 	float hpPercent = (EnemyHp / 5.0f);
 	slope = atan2((playerPos[0] - x), (playerPos[1] - y));
-	
-	if ((x - playerPos[0]) > 0) {
-		x -= (0.07f * displacement);
+
+	if (fabs(x - playerPos[0]) <= 1.3f){
+		if ((x - playerPos[0]) > 0) {
+			x -= (0.45f * displacement);
+		}
+		if ((x - playerPos[0]) < 0) {
+			x += (0.45f * displacement);
+		}
 	}
-	if ((x - playerPos[0]) < 0) {
-		x += (0.07f * displacement);
+	else {
+		if ((x - playerPos[0]) > 0) {
+			x += (0.45f * displacement);
+		}
+		if ((x - playerPos[0]) < 0) {
+			x -= (0.45f * displacement);
+		}
 	}
-	if ((y - playerPos[1]) > 0) {
-		y -= (0.07f * displacement);
+	if (fabs(y - playerPos[1]) <= 1.3f) {
+		if ((y - playerPos[1]) > 0) {
+			y -= (0.5f * displacement);
+		}
+		if ((y - playerPos[1]) < 0) {
+			y += (0.5f * displacement);
+		}
 	}
-	if ((y - playerPos[1]) < 0) {
-		y += (0.07f * displacement);
+	else {
+		if ((y - playerPos[1]) > 0) {
+			y += (0.5f * displacement);
+		}
+		if ((y - playerPos[1]) < 0) {
+			y -= (0.5f * displacement);
+		}
 	}
 
-	if ((fabs(y - playerPos[1]) < 0.13f) && (fabs(x - playerPos[0]) < 0.13f)) 
+	if (x < -1.05f) {
+		x = 1.05f;
+	}
+	if (x > 1.05f) {
+		x = -1.05f;
+	}
+	if (y > 1.05f) {
+		y = -1.05f;
+	}
+	if (y < -1.05f) {
+		y = 1.05f;
+	}
+
+	float distance = sqrt(((x - playerPos[0])*(x - playerPos[0])) + ((y - playerPos[1])*(y - playerPos[1])));
+	if (distance <= 0.1f) 
 	{
 		touch = true;
 	}
@@ -104,92 +139,18 @@ BoxEnemy::ArrVer BoxEnemy::update(float* playerPos, float displacement) {
 	DirectX::XMStoreFloat4(&p4, v4);
 
 	ArrVer newVertices;
-	newVertices.vertices[0] = { p1.x, p1.y, 0, 1, 1, 1, 1 };
-	newVertices.vertices[1] = { p2.x, p2.y, 0, 1, 1, 1, 1 };
-	newVertices.vertices[2] = { p3.x, p3.y, 0, 1, 1, 1, 1 };
-	newVertices.vertices[3] = { p4.x, p4.y, 0, 1, 1, 1, 1 };
-
-	newVertices.vertices[4] = { x - 0.05f, y + 0.06f, 0, 1, 0, 0, 1 };
-	newVertices.vertices[5] = { ((x - 0.05f) + (0.17f * hpPercent)), y + 0.06f, 0, 1, 0, 0, 1 };
-	newVertices.vertices[6] = { x - 0.05f, y + 0.08f, 0, 1, 0, 0, 1 };
-	newVertices.vertices[7] = { ((x - 0.05f) + (0.17f * hpPercent)), y + 0.08f, 0, 1, 0, 0, 1 };
+	newVertices.vertices[0] = { p1.x, p1.y, 0, 0, 0 };
+	newVertices.vertices[1] = { p2.x, p2.y, 0, 1, 0 };
+	newVertices.vertices[2] = { p3.x, p3.y, 0, 0, 1 };
+	newVertices.vertices[3] = { p4.x, p4.y, 0, 1, 1 };
+	newVertices.vertices[4] = { x - 0.05f, y + 0.06f, 0, 0, 0 };
+	newVertices.vertices[5] = { ((x - 0.05f) + (0.17f * hpPercent)), y + 0.06f, 0, 1, 0 };
+	newVertices.vertices[6] = { x - 0.05f, y + 0.08f, 0, 0, 1 };
+	newVertices.vertices[7] = { ((x - 0.05f) + (0.17f * hpPercent)), y + 0.08f, 0, 1, 1 };
 
 	return newVertices;
 }
-/*
-void BoxEnemy::draw(Renderer& renderer) {
-	auto deviceContext = renderer.getDeviceContext();
 
-	D3D11_MAPPED_SUBRESOURCE resource;
-	assert(m_pVertexBuffer != NULL);
-	deviceContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-
-	memcpy(resource.pData, m_pVertices, sizeof(m_pVertices));
-	deviceContext->Unmap(m_pVertexBuffer, 0);
-
-	deviceContext->Map(mIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-	memcpy(resource.pData, m_pIndices, sizeof(m_pIndices));
-	deviceContext->Unmap(mIB, 0);
-	
-
-	// Bind our Player shaders
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	// Bind our vertex buffer
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-
-	deviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
-	deviceContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
-
-	// Draw
-	deviceContext->DrawIndexed(6, 0, 0);
-
-}
-*/
 bool BoxEnemy::checkCollision(){
 	return touch;
 }
-
-/*
-void BoxEnemy::createMesh(Renderer& ren) {
-
-	// Create our vertext buffer
-	Vertex vertices[] = {
-	{ 0, 0, 0, 1, 1, 1, 1 },
-	{ 0, 1, 0, 1, 1, 1, 1 },
-	{ 1, 0, 0, 1, 1, 1, 1 },
-	{ 1, 1, 0, 1, 1, 1, 1 }
-	};
-
-	auto vertexBufferDesc = CD3D11_BUFFER_DESC(sizeof(vertices), D3D11_BIND_VERTEX_BUFFER);
-	vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	D3D11_SUBRESOURCE_DATA vertexData = { 0 };
-	vertexData.pSysMem = m_pVertices;
-
-	ren.getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_pVertexBuffer);
-
-	DWORD indices[6] =
-	{
-		2, 1, 0,
-		1, 2, 3
-	};
-
-	D3D11_BUFFER_DESC ibd;
-	ibd.Usage = D3D11_USAGE_DYNAMIC;
-	ibd.ByteWidth = sizeof(DWORD) * 6;
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ibd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	ibd.MiscFlags = 0;
-	ibd.StructureByteStride = 0;
-
-	// Specify the data to initialize the index buffer.
-	D3D11_SUBRESOURCE_DATA iinitData;
-	iinitData.pSysMem = m_pIndices;
-
-	// Create the index buffer.
-	ren.getDevice()->CreateBuffer(&ibd, &iinitData, &mIB);
-	ren.getDeviceContext()->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
-}
-*/

@@ -24,7 +24,7 @@ GameView::GameView(int ax){
 	init();
 	m_pAim[0] = 0;
 	m_pAim[1] = 0;
-	deltaTime = 0;
+	deltaFT = 0;
 }
 
 GameView::~GameView() {
@@ -32,48 +32,30 @@ GameView::~GameView() {
 	delete m_pPos;
 }
 
-void GameView::update(int sw, int sh, int mouseX, int mouseY, Timer& time) {
+void GameView::update(int sw, int sh, int mouseX, int mouseY, Timer& time, HWND hWnd) {
 	mDown = false;
-	changeAim(sw, sh, mouseX, mouseY);
+	wDown = false;
+	currentFT = time.deltaFT();
+	deltaFT = currentFT - prevFT;
+	prevFT = time.deltaFT();
+	changeAim(sw, sh, mouseX, mouseY, hWnd);
 	changePos(time);
 }
 
 void GameView::setPos(float* pos) {
-	slope = atan2((m_pAim[0] - x), (m_pAim[1] - y));
+	slope = atan2((m_pAim[0] - pos[0]), (m_pAim[1] - pos[1]));
 
-	if (pos[0] == 1) {
-		y += 0.01f;
-	}
-	if (pos[1] == 1) {
-		y -= 0.01f;
-	}
-	if (pos[3] == 1) {
-		x += 0.01f;
-	}
-	if (pos[2] == 1) {
-		x -= 0.01f;
-	}
-
-	if (x < -1.15f) {
-		x = 1.1f;
-	}
-	if (x > 1.15f) {
-		x = -1.1f;
-	}
-	if (y > 1.15f) {
-		y = -1.1f;
-	}
-	if (y < -1.15f) {
-		y = 1.1f;
-	}
-	m_pPos[0] = x;
-	m_pPos[1] = y;
+	x = pos[0];
+	y = pos[1];
+	m_pPos[0] = pos[0];
+	m_pPos[1] = pos[1];
 	m_pPos[2] = slope;
 
 }
 
-void GameView::changeAim(int sw, int sh, int mouseX, int mouseY) {
+void GameView::changeAim(int sw, int sh, int mouseX, int mouseY, HWND hWnd) {
 	GetCursorPos(&cursorPos);
+	ScreenToClient(hWnd, &cursorPos);
 	float mx = ((2.0f * (float)cursorPos.x) / (float)sw) - 1.0f;
 	float my = (((2.0f * (float)cursorPos.y) / (float)sh) - 1.0f) * -1.0f;
 
@@ -96,20 +78,21 @@ void GameView::changeAim(int sw, int sh, int mouseX, int mouseY) {
 
 void GameView::changePos(Timer& time) {
 	slope = atan2((m_pAim[0] - x), (m_pAim[1] - y));
-	deltaTime = time.deltaFT() - deltaTime;
+	
 	if (GetAsyncKeyState(0x57)) {
-		y += (0.7f * deltaTime);
+		y += (0.8125f * deltaFT);
+		wDown = true;
 	}
 	if (GetAsyncKeyState(0x53)) {
-		y -= (0.7f * deltaTime);
+		y -= (0.8125f * deltaFT);
 	}
 	if (GetAsyncKeyState(0x44)) {
-		x += (0.7f * deltaTime);
+		x += (0.5f * deltaFT);
 	}
 	if (GetAsyncKeyState(0x41)) {
-		x -= (0.7f * deltaTime);
+		x -= (0.5f * deltaFT);
 	}
-	deltaTime = time.deltaFT();
+
 	if (x < -1.15f) {
 		x = 1.1f;
 	}
@@ -164,4 +147,5 @@ void GameView::init() {
 	x = 0;
 	y = 0;
 	slope = 0;
+	wDown = false;
 }

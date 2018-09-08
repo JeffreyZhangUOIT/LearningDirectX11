@@ -26,21 +26,25 @@ public:
 	GameView(int x);
 	~GameView();
 	void init();
-	void update(int sw, int sh, int mouseX, int mouseY, Timer& time);
+	void update(int sw, int sh, int mouseX, int mouseY, Timer& time, HWND hWnd);
 	float* getPos();
 	float* getAim();
 	void mouseDown(MSG * msg);
 	bool getMouse();
 	void setPos(float* pos);
 	void changePos(Timer& time);
+	bool wDown;
 
 private:
-	void changeAim(int sw, int sh, int mouseX, int mouseY);
+	void changeAim(int sw, int sh, int mouseX, int mouseY, HWND hWnd);
 	
 	bool mDown = false;
+	
 	float* m_pAim = nullptr;
 	float* m_pPos = nullptr;
 	float x, y, slope;
-	float deltaTime;
+	float prevFT;
+	float currentFT;
+	float deltaFT;
 	POINT cursorPos;
 };

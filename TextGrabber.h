@@ -19,8 +19,14 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 #include "SoundManager.h"
+#include "MinigameManager.h"
 #include "TextHandler.h"
 #include "BoxFactory.h"
+#include "PoseArtManager.h"
+#include "Choice.h"
+#include "BackgroundManager.h"
+#include "TransitionManager.h"
+#include "Timer.h"
 #include <stdio.h> 
 
 
@@ -33,9 +39,9 @@ public:
 	void loadTheChapter();
 	void minigameReturn(char* nextScene);
 	void getNextCommand();
-	int execCommand(SoundManager& sounds, TextHandler& drawText);
+	int execCommand(SoundManager& sounds, TextHandler& drawText, MinigameManager& miniMan, Choice& choice, PoseArtManager& pose, Background& backdrop, Transition& transistor, Timer& time);
 	void setChOff(int ch, int off);
-
+	int Tojihime = 0, Akari = 0, Mifune = 0, Inori = 0, Emilia = 0;
 private:
 	FILE * fp;
 	char command[256];
@@ -46,7 +52,7 @@ private:
 	bool firstInstance;
 	int indexedLines[3000];
 	int indexedScenes[100];
-
+	
 	int eofPos;
 
 	DirectX::XMVECTORF32 red = { 1, 0, 0, 1 };

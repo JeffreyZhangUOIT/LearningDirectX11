@@ -75,7 +75,6 @@ void AIPlayer::simMouse(std::vector<BoxEnemy>& boxes, float* pos)
 
 float* AIPlayer::simKeyboard(std::vector<BoxEnemy>& boxes, float* pos)
 {
-	INPUT ip;
 	float* position = (float*)malloc(sizeof(float) * 4);
 	position[0] = 0; position[1] = 0; position[2] = 0; position[3] = 0;
 	numEnemies = 0;

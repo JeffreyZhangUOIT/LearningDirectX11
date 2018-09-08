@@ -19,13 +19,14 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 #include "Renderer.h"
+#include "TextureManager.h"
 
 class Mouse{
 public:
 	Mouse(Renderer& ren);
 	~Mouse();
 	void update(Renderer& ren, float* aim);
-	void draw(Renderer& ren);
+	void draw(Renderer& ren, TextureManager& tex);
 	void createMesh(Renderer& ren);
 	float x, y;
 

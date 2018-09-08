@@ -29,24 +29,11 @@ public:
 	Bullet(const Bullet &bul); // Copy constructor
 	~Bullet();
 
-	struct Vertex {
-		float x, y, z;
-		float r, g, b, a;
-	};
-
-	struct ArrVer {
-		struct Vertex vertices[4];
-	};
-
-	ArrVer update(float displacement);
-	void draw(Renderer& ren);
+	Renderer::SquareObj update(float displacement);
 	bool OOB = false;
 	float* getPos();
 
 private:
-	void createMesh(Renderer& ren);
 	float x, y, dir;
 	float * point = nullptr;
-
-
 };

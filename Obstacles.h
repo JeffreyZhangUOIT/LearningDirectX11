@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright 2017, 2018 Jeffrey Zhang
 
@@ -16,17 +17,29 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include "Renderer.h"
 #include "Timer.h"
+#include <DirectXMath.h>
 
+class Obstacles {
 
-void Timer::resetTime() {
-	startTime = clock();
-}
+public:
+	struct ArrVer {
+		struct Renderer::Vertex vertices[4];
+	};
 
-double Timer::elapsedTime() {
-	return (double)((clock() - startTime) / (double)CLOCKS_PER_SEC);;
-}
+	Obstacles(float posx, float posy, int seed);
+	Obstacles(const Obstacles &b2);
+	~Obstacles();
+	ArrVer update(float* playerPos, float displacement);
+	bool checkCollision();
+	float* getPos();
+	bool OOB;
 
-float Timer::deltaFT() {
-	return (float)((clock() - startTime) / (float)CLOCKS_PER_SEC);
-}
+private:
+	Obstacles::ArrVer newLoc;
+	float x, y, dir, speed;
+	bool touch;
+	int colour;
+};

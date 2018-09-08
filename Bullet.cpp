@@ -28,7 +28,7 @@ Bullet::Bullet(float* pos, Renderer& ren, Timer& time)
 	dir = pos[2];
 
 	// Move the bullet out of the player, without drawing it. Helps make it seem like it's coming out of the right place.
-	update(0.05f);
+	update(0.001f);
 }
 
 Bullet::Bullet(const Bullet &bul) {
@@ -47,34 +47,33 @@ Bullet::~Bullet()
 
 }
 
-Bullet::ArrVer Bullet::update(float displacement)
+Renderer::SquareObj Bullet::update(float displacement)
 {
-	// Weird teleporting behavior.  (0.9f * deltaTime)
 	OOB = false;
 	
 	if ((dir > 0) & (dir < 0.5f* 3.14f)) {
-		y += (0.6f * displacement) * cosf(fabs(dir));
+		y += (1.0f * displacement)* cosf(fabs(dir));
 	}
 	if (dir > 0.5f*3.14) {
-		y -= (0.6f * displacement) * -cosf(fabs(dir));
+		y -= (1.0f * displacement)* -cosf(fabs(dir));
 	}
 	if ((dir < 0) & (dir > -0.5f*3.14)) {
-		y += (0.6f * displacement) * cosf(fabs(dir));
+		y += (1.0f * displacement)* cosf(fabs(dir));
 	}
 	if (dir < -0.5f*3.14) {
-		y -= (0.6f * displacement) * -cosf(fabs(dir));
+		y -= (1.0f * displacement)* -cosf(fabs(dir));
 	}
 	if ((dir > 0) & (dir < 0.5f* 3.14f)) {
-		x += (0.6f * displacement) * sinf(fabs(dir));
+		x += (1.0f * displacement)* sinf(fabs(dir));
 	}
 	if (dir > 0.5f*3.14) {
-		x += (0.6f * displacement) * sinf(fabs(dir));
+		x += (1.0f * displacement)* sinf(fabs(dir));
 	}
 	if ((dir < 0) & (dir > -0.5f*3.14)) {
-		x -= (0.6f * displacement) * sinf(fabs(dir));
+		x -= (1.0f * displacement)* sinf(fabs(dir));
 	}
 	if (dir < -0.5f*3.14) {
-		x -= (0.6f * displacement) * sinf(fabs(dir));
+		x -= (1.0f * displacement)* sinf(fabs(dir));
 	}
 	if (dir == 0) {
 		y += 0.03f;
@@ -82,8 +81,6 @@ Bullet::ArrVer Bullet::update(float displacement)
 	if (fabs(x) > 1.2f || fabs(y) > 1.2f) {
 		OOB = true;
 	}
-
-	
 
 	DirectX::XMFLOAT4 p1, p2, p3, p4;
 	DirectX::XMVECTOR scale = DirectX::XMVectorSet(1, 1, 1, 0);
@@ -109,13 +106,12 @@ Bullet::ArrVer Bullet::update(float displacement)
 	DirectX::XMStoreFloat4(&p3, v3);
 	DirectX::XMStoreFloat4(&p4, v4);
 
-	Bullet::ArrVer newVertices;
-	newVertices.vertices[0] = { p1.x, p1.y, 0, 1, 0.7176f, 0.1176f, 1 };
-	newVertices.vertices[1] = { p2.x, p2.y, 0, 1, 0.7176f, 0.1176f, 1 };
-	newVertices.vertices[2] = { p3.x, p3.y, 0, 1, 0.7176f, 0.1176f, 1 };
-	newVertices.vertices[3] = { p4.x, p4.y, 0, 1, 0.7176f, 0.1176f, 1 };
+	Renderer::SquareObj newVertices;
+	newVertices.vertices[0] = { p1.x, p1.y, 0, 0, 1 };
+	newVertices.vertices[1] = { p2.x, p2.y, 0, 1, 1 };
+	newVertices.vertices[2] = { p3.x, p3.y, 0, 0, 0 };
+	newVertices.vertices[3] = { p4.x, p4.y, 0, 1, 0 };
 
-	
 	return newVertices;
 }
 

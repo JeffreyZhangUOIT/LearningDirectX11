@@ -25,16 +25,22 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 
 class Settings {
 public:
-	Settings(SoundManager& music, TextHandler& text);
+	Settings(int i);
+
 	~Settings();
+	void init(SoundManager& music, TextHandler& text);
 	void updateMasterVol(SoundManager& music, float vol);
 	void updateCharPerSec(TextHandler& text, double cps);
 	void save(SoundManager& music);
+	char resolution[50];
+
 private:
 	bool opened = false;
 	float masterVolume = 0.5f;
 	float someOtherParam = 3;
 	double charPerSec = 50;
+	int sW, sH;
+	
 	FILE * settings;
 };
 

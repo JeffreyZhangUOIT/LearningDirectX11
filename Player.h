@@ -19,22 +19,21 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 #include "Renderer.h"
 #include "Timer.h"
+#include "TextureManager.h"
 
 class Player {
 public:
-	Player(Renderer& ren);
+	Player();
 	~Player();
-	void update(Renderer& renderer, float* pos, bool dmg);
+	float * update(Renderer& renderer, TextureManager& tex, float* pos, bool dmg, int gamemode);
 	void draw(Renderer& renderer);
 	void init();
-	bool alive;
-	int playerHp = 3;
+	void createMesh(Renderer& renderer);
 
 private:
-	
 	int immunity = 0;
-	
-	void createMesh(Renderer& renderer);
-	ID3D11Buffer* m_pVertexBuffer = nullptr;
+	float pPos[2];
 
+	ID3D11Buffer* m_pVertexBuffer = nullptr;
+	ID3D11Buffer* mIB = nullptr;
 };

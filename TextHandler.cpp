@@ -15,6 +15,27 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
+
+The MIT License (MIT)
+
+Copyright (c) 2018 Microsoft Corp
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be included in all copies
+or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 #include "TextHandler.h"
 using namespace std;
@@ -22,18 +43,27 @@ using namespace std;
 TextHandler::TextHandler(Renderer& ren, int sw, int sh) {
 	timer.resetTime();
 	cabri32 = std::make_unique<DirectX::SpriteFont>(ren.getDevice(), L"cabri32.spritefont");
-	bellmt16 = std::make_unique<DirectX::SpriteFont>(ren.getDevice(), L"bellmt16.spritefont");
 	vinerHand16 = std::make_unique<DirectX::SpriteFont>(ren.getDevice(), L"VinerHand16.spritefont");
+	stencil30 = std::make_unique<DirectX::SpriteFont>(ren.getDevice(), L"Stencil30.spritefont");
+
+	bellmt16 = std::make_unique<DirectX::SpriteFont>(ren.getDevice(), L"bellmt16.spritefont");
+	bellmt18 = std::make_unique<DirectX::SpriteFont>(ren.getDevice(), L"bellmt18.spritefont");
+	bellmt20 = std::make_unique<DirectX::SpriteFont>(ren.getDevice(), L"bellmt20.spritefont");
+	bellmt22 = std::make_unique<DirectX::SpriteFont>(ren.getDevice(), L"bellmt22.spritefont");
 	bellmt24 = std::make_unique<DirectX::SpriteFont>(ren.getDevice(), L"bellmt24.spritefont");
-	vinerHand32 = std::make_unique<DirectX::SpriteFont>(ren.getDevice(), L"VinerHand32.spritefont");
+	
 
 	m_spriteBatch = std::make_unique<DirectX::SpriteBatch>(ren.getDeviceContext());
 	screenWidth = sw; screenHeight = sh;
-	bellmt16->SetDefaultCharacter(L' ');
+
 	vinerHand16->SetDefaultCharacter(L' ');
 	cabri32->SetDefaultCharacter(L' ');
+	stencil30->SetDefaultCharacter(L' ');
+	bellmt16->SetDefaultCharacter(L' ');
+	bellmt18->SetDefaultCharacter(L' ');
+	bellmt20->SetDefaultCharacter(L' ');
+	bellmt22->SetDefaultCharacter(L' ');
 	bellmt24->SetDefaultCharacter(L' ');
-	vinerHand32->SetDefaultCharacter(L' ');
 
 	charPerSec = 50;
 	srand(time(NULL));
@@ -47,7 +77,7 @@ TextHandler::~TextHandler() {
 	bellmt16.reset();
 	vinerHand16.reset();
 	bellmt24.reset();
-	vinerHand32.reset();
+	stencil30.reset();
 	m_spriteBatch.reset();
 }
 
@@ -106,11 +136,11 @@ void TextHandler::drawMyText(const wchar_t* output, float x, float y, DirectX::X
 
 	m_spriteBatch->Begin();
 
-	DirectX::SimpleMath::Vector2 origin = cabri32->MeasureString(output);
+	DirectX::SimpleMath::Vector2 origin = bellmt24->MeasureString(output);
 	origin.x /= 2;
 	origin.y /= 2;
 
-	cabri32->DrawString(m_spriteBatch.get(), output,
+	bellmt24->DrawString(m_spriteBatch.get(), output,
 		m_fontPos, color, 0.f, origin);
 	
 	m_spriteBatch->End();	
@@ -122,8 +152,9 @@ void TextHandler::resetMyTime() {
 
 void TextHandler::drawDialog(char name[256], char parameters[1000], DirectX::XMVECTORF32 color) {
 	char buf[13][110];
-	char tempBuf2[1000];
 	char tempBuf[1000];
+	char tempBuf2[1000];
+	char tempBuf3[100] = "Some phrase that has 100 characters inside of it used for determining the ideal font size. 10 more.";
 	char* token;
 	char* nextTok;
 	bool notFull = true;
@@ -137,12 +168,14 @@ void TextHandler::drawDialog(char name[256], char parameters[1000], DirectX::XMV
 
 	while (token != NULL) 
 	{
+		// Replace #Academy
 		if (strncmp(token, "#Academy", strlen("#Academy")) == 0) 
 		{
 			strcat_s(tempBuf2, schoolName);
 			pos = pos + strlen(schoolName);
 		}
 
+		// Replace #MC
 		else if (strncmp(token, "#MC", strlen("#MC")) == 0){
 			strcat_s(tempBuf2, mcName);
 			pos = pos + strlen(mcName);
@@ -160,18 +193,22 @@ void TextHandler::drawDialog(char name[256], char parameters[1000], DirectX::XMV
 		token = strtok_s(NULL, " ", &nextTok);
 	}
 
-	for (int c = 0; c < strlen(tempBuf2); c++) {
-		
-		if (timer.elapsedTime() > (c/charPerSec) ){
+	// Place n characters based on time since this line of dialog started.
+	for (int c = 0; c < strlen(tempBuf2); c++) 
+	{
+		if (timer.elapsedTime() > (c/charPerSec) )
+		{
 			tempBuf[c] = tempBuf2[c];
 		}
-		else {
+		else 
+		{
 			tempBuf[c] = '\0';
 		}
 	}
 
 	token = strtok_s(tempBuf, " ", &nextTok);
 	memset(buf, '\0', sizeof(char) * 13 * 110);
+
 	// Fill buf
 	while (token != NULL) 
 	{
@@ -186,24 +223,74 @@ void TextHandler::drawDialog(char name[256], char parameters[1000], DirectX::XMV
 		}
 	}
 
+	wchar_t * buffer2;
+	int size = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, tempBuf3, -1, NULL, 0);
+	buffer2 = new wchar_t[size];
+	if (!MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, tempBuf3, -1, buffer2, size)) {
+		exit(99);
+	}
+
 	m_spriteBatch->Begin();
-	
-	int size;
-	// This conversion from ascii to unicode does not work. Find or make fix.
+
+
+	// Draw dialog one line at a time, moving down every 110 characters (size of buf[currentBuf])
 	while (currentBuf >= 0) {
 
 		m_fontPos.x = (screenWidth / 24) * 3;
-		m_fontPos.y = (screenHeight / 40) * (30 + currentBuf);
+		m_fontPos.y = (screenHeight / 20) * (15 + currentBuf);
 		wchar_t * buffer1;
-		int size = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, buf[currentBuf], -1, NULL, 0);
+		size = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, buf[currentBuf], -1, NULL, 0);
 		buffer1 = new wchar_t[size];
 		if (!MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, buf[currentBuf], -1, buffer1, size)) {
 			exit(99);
 		}
 
-		DirectX::SimpleMath::Vector2 origin1 = { 0, 0 };
-
-		bellmt24->DrawString(m_spriteBatch.get(), buffer1, m_fontPos, black, 0.f, origin1);
+		// Literally hard-coded fake dynamic font rendering. There has to be a better way.... Like fonts with mip maps or something. Too much work for now though.
+		// buffer2 is used to determine the font size, while buffer1 has the actual text to be rendererd. 
+		DirectX::SimpleMath::Vector2 origin1 = bellmt24->MeasureString(buffer2);
+		if (origin1.x < (screenWidth * 0.8f))
+		{
+			origin1.x = 0;
+			origin1.y = 0;
+			bellmt24->DrawString(m_spriteBatch.get(), buffer1, m_fontPos, black, 0.f, origin1);
+		}
+		else
+		{
+			origin1 = bellmt22->MeasureString(buffer2);
+			if (origin1.x < (screenWidth * 0.8f))
+			{
+				origin1.x = 0;
+				origin1.y = 0;
+				bellmt22->DrawString(m_spriteBatch.get(), buffer1, m_fontPos, black, 0.f, origin1);
+			}
+			else
+			{
+				origin1 = bellmt20->MeasureString(buffer2);
+				if (origin1.x < (screenWidth * 0.8f))
+				{
+					origin1.x = 0;
+					origin1.y = 0;
+					bellmt20->DrawString(m_spriteBatch.get(), buffer1, m_fontPos, black, 0.f, origin1);
+				}
+				else
+				{
+					origin1 = bellmt18->MeasureString(buffer2);
+					if (origin1.x < (screenWidth * 0.8f))
+					{
+						origin1.x = 0;
+						origin1.y = 0;
+						bellmt18->DrawString(m_spriteBatch.get(), buffer1, m_fontPos, black, 0.f, origin1);
+					}
+					else
+					{
+						origin1.x = 0;
+						origin1.y = 0;
+						bellmt16->DrawString(m_spriteBatch.get(), buffer1, m_fontPos, black, 0.f, origin1);
+					}
+				}
+			}
+		}
+		
 
 		if (buffer1) {
 			delete buffer1;
@@ -220,11 +307,12 @@ void TextHandler::drawDialog(char name[256], char parameters[1000], DirectX::XMV
 		exit(99);
 	}
 
-	DirectX::SimpleMath::Vector2 origin2 = vinerHand16->MeasureString(namebuf);
-	origin2.x =0;
+	DirectX::SimpleMath::Vector2 origin2 = stencil30->MeasureString(namebuf);
+
+	origin2.x = 0;
 	origin2.y /= 2;
 
-	vinerHand32->DrawString(m_spriteBatch.get(), namebuf, m_fontPos, red, 0.f, origin2);
+	stencil30->DrawString(m_spriteBatch.get(), namebuf, m_fontPos, pansy, 0.f, origin2);
 
 	m_spriteBatch->End();
 
@@ -234,11 +322,11 @@ void TextHandler::batchDraw(const wchar_t* output, float x, float y, float rotat
 	m_fontPos.x = x;
 	m_fontPos.y = y;
 
-	DirectX::SimpleMath::Vector2 origin = cabri32->MeasureString(output);
+	DirectX::SimpleMath::Vector2 origin = bellmt24->MeasureString(output);
 	origin.x /= 2;
 	origin.y /= 2;
 
-	cabri32->DrawString(m_spriteBatch.get(), output,
+	bellmt24->DrawString(m_spriteBatch.get(), output,
 		m_fontPos, color, rotate, origin);
 }
 
@@ -254,15 +342,15 @@ void TextHandler::deathRattle(float x, float y, DirectX::XMVECTORF32 color) {
 	timedText.emplace_back(elem);
 }
 
-void TextHandler::tempMessage(float x, float y, const wchar_t* out, DirectX::XMVECTORF32 color) {
-	float randf = rand() % 10;
+void TextHandler::tempMessage(int timeToLive, float x, float y, const wchar_t* out, DirectX::XMVECTORF32 color) 
+{
 	textObjs elem;
 	elem.x = ((x + 1) * screenWidth) / 2;
 	elem.y = screenHeight - (((y + 1) * screenHeight) / 2);
 	elem.color = color;
 	elem.rotation = 0.0f;
 	elem.string = out;
-	elem.timeToLive = 50;
+	elem.timeToLive = timeToLive;
 	timedText.emplace_back(elem);
 }
 
@@ -309,7 +397,7 @@ void TextHandler::update() {
 			batchDraw(it->string, it->x, it->y, it->rotation, it->color);
 			it++;
 		}
-
 	}
+
 	m_spriteBatch->End();
 }

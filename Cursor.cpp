@@ -18,11 +18,6 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Cursor.h"
 
-struct Vertex {
-	float x, y, z;
-	float r, g, b, a;
-};
-
 Mouse::Mouse(Renderer& ren){
 	createMesh(ren);
 	x = 0;
@@ -36,17 +31,11 @@ Mouse::~Mouse(){
 
 void Mouse::update(Renderer& renderer, float* aim) {
 	
-	Vertex vertices[] = {
-	{ aim[0]-0.01f, aim[1]-0.01f, 0.001f, 0, 0, 1, 1 },
-	{ aim[0]+0.01f, aim[1]-0.01f, 0.001f, 0, 0, 1, 1 },
-	{ aim[0]-0.01f, aim[1]+0.01f, 0.001f, 0, 0, 1, 1 },
-	{ aim[0]+0.01f, aim[1]+0.01f, 0.001f, 0, 0, 1, 1 }
-	};
-
-	DWORD indices[6] =
-	{
-		0, 1, 2,
-		1, 2, 3
+	Renderer::Vertex vertices[] = {
+	{ aim[0]-0.01f, aim[1]-0.01f, 0.001f, 0, 1 },
+	{ aim[0]+0.01f, aim[1]-0.01f, 0.001f, 1, 1 },
+	{ aim[0]-0.01f, aim[1]+0.01f, 0.001f, 0, 0 },
+	{ aim[0]+0.01f, aim[1]+0.01f, 0.001f, 1, 0 }
 	};
 
 	D3D11_MAPPED_SUBRESOURCE resource;
@@ -54,29 +43,25 @@ void Mouse::update(Renderer& renderer, float* aim) {
 	memcpy(resource.pData, vertices, sizeof(vertices));
 	renderer.getDeviceContext()->Unmap(m_pVertexBuffer, 0);
 
-	renderer.getDeviceContext()->Map(mIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
-	memcpy(resource.pData, indices, sizeof(indices));
-	renderer.getDeviceContext()->Unmap(mIB, 0);
-
 }
 
 void Mouse::createMesh(Renderer& ren) {
 	// Create our vertext buffer
-	Vertex vertices[] = {
-	{ -0.01f, -0.01f, 0.001f, 1, 1, 1, 1 },
-	{ +0.01f, -0.01f, 0.001f, 1, 1, 1, 1 },
-	{ -0.01f, 0.01f, 0.001f, 1, 1, 1, 1 },
-	{ 0.01f, 0.01f, 0.001f, 1, 1, 1, 1 }
+	Renderer::Vertex vertices[] = {
+	{ -0.01f, -0.01f, 0.001f, 0, 0},
+	{ +0.01f, -0.01f, 0.001f, 1, 0 },
+	{ -0.01f, 0.01f, 0.001f, 0, 1 },
+	{ 0.01f, 0.01f, 0.001f, 1, 1}
 	};
 
-	auto vertexBufferDesc = CD3D11_BUFFER_DESC(sizeof(Vertex)*4, D3D11_BIND_VERTEX_BUFFER);
+	auto vertexBufferDesc = CD3D11_BUFFER_DESC(sizeof(Renderer::Vertex)*4, D3D11_BIND_VERTEX_BUFFER);
 	vertexBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	vertexBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	D3D11_SUBRESOURCE_DATA vertexData = { 0 };
 	vertexData.pSysMem = vertices;
 	ren.getDevice()->CreateBuffer(&vertexBufferDesc, &vertexData, &m_pVertexBuffer);
 
-	// Create our indicies buffer becareful of back-face culling.
+	// Create our indicies buffer be careful of back-face culling.
 	DWORD indices[6] =
 	{
 		2, 1, 0,
@@ -101,17 +86,19 @@ void Mouse::createMesh(Renderer& ren) {
 
 }
 
-void Mouse::draw(Renderer& ren) {
+void Mouse::draw(Renderer& ren, TextureManager& tex) {
 	auto deviceContext = ren.getDeviceContext();
+
+	tex.changeTex(ren, 2);
 
 	// Bind our Player shaders
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// Bind our vertex buffer
-	UINT stride = sizeof(Vertex);
+	UINT stride = sizeof(Renderer::Vertex);
 	UINT offset = 0;
 	deviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &stride, &offset);
-	//deviceContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
+	deviceContext->IASetIndexBuffer(mIB, DXGI_FORMAT_R32_UINT, 0);
 
 	// Draw
 	deviceContext->DrawIndexed(6, 0, 0);

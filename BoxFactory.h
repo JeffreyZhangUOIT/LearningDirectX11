@@ -19,20 +19,20 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 #include "Renderer.h"
+#include "TextureManager.h"
 
 class BoxFactory {
 public:
-	struct color {
-		float r, g, b, a;
-	};
 
 	BoxFactory(Renderer& ren);
 	~BoxFactory();
-	void update(Renderer& ren, float* boxDimen, color setColor);
-	void draw(Renderer& ren);
+	void update(Renderer& ren, float* boxDimen, int n, float mx, float my);
+	void draw(Renderer& ren, TextureManager& tex);
+
 private:
 	void createMesh(Renderer& ren);
 	ID3D11Buffer* m_pVertexBuffer = nullptr;
 	ID3D11Buffer* mIB = nullptr;
-	int flag[];
+	bool halfBox;
+	int boxColor;
 };

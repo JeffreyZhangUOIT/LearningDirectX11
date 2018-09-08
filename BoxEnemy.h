@@ -24,42 +24,21 @@ along with ProjectFiasco.  If not, see <http://www.gnu.org/licenses/>.
 class BoxEnemy {
 	
 public:
-	struct Vertex {
-		float x, y, z;
-		float r, g, b, a;
-	};
-
 	struct ArrVer {
-		Vertex vertices[8];
+		Renderer::Vertex vertices[8];
 	};
-
-	BoxEnemy(float posx, float posy, Renderer& ren);
+	BoxEnemy(float posx, float posy);
 	BoxEnemy(const BoxEnemy &b2);
 	~BoxEnemy();
 	ArrVer update(float* playerPos, float time);
 	bool checkCollision();
 	int EnemyHp = 5;
 	float* getPos();
+	float point[2];
 	bool bulletCollision(float* pos);
 
 private:
 	float x, y, slope;
-
-	ID3D11Buffer* m_pVertexBuffer = nullptr;
-	ID3D11Buffer* mIB = nullptr;
 	bool touch;
-
-	Vertex m_pVertices[4] = {
-		{ 1, 0, 0, 1, 1, 1, 1 },
-		{ 0, 1, 0, 1, 1, 1, 1 },
-		{ 0, 0, 0, 1, 1, 1, 1 },
-		{ 1, 1, 0, 1, 1, 1, 1 }
-	};
-
-	DWORD m_pIndices[4] =
-	{
-		0, 1, 2,
-		3
-	};
 
 };

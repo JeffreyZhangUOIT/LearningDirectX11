@@ -57,3 +57,10 @@ HWND Window::getHandle()
 {
 	return m_pHandle;
 }
+
+void Window::ResizeWindow(int width, int height)
+{
+	w = width;
+	h = height;
+	SetWindowPos(m_pHandle, HWND_TOP, 0, 0, width, height, SWP_DEFERERASE | SWP_NOMOVE );
+}

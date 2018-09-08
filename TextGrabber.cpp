@@ -72,8 +72,6 @@ void TextGrabber::getNextCommand() {
 					}
 				}
 			}
-
-			
 			//strncpy_s(parameters, 1000, token, 999);
 		}
 		else {
@@ -90,7 +88,7 @@ void TextGrabber::getNextCommand() {
 	}
 }
 
-int TextGrabber::execCommand(SoundManager& sounds, TextHandler& drawText) {
+int TextGrabber::execCommand(SoundManager& sounds, TextHandler& drawText, MinigameManager& miniManager, Choice& choice, PoseArtManager& pose, Background& backdrop, Transition& transistor, Timer& time) {
 	fopen_s(&fp, "Default.txt", "w+");
 	if (chapter == 1) {
 		fopen_s(&fp, "Chapter1.txt", "r");
@@ -134,53 +132,135 @@ int TextGrabber::execCommand(SoundManager& sounds, TextHandler& drawText) {
 		}
 		getNextCommand();
 	}
-	else if (strcmp(command, "Minigame") == 0) {
-		float scoreArr[10];
-		int i = 0;
-		char score[256];
-		char minigamename[256];
-		char sceneBuf[256];
-
-		token = strtok_s(parameters, "{} ", &nextTok);
-		while (*token)
-		{
-			minigamename[i] = *token;
-			token++;
-			i++;
-		}
-		i = 0;
-		token = strtok_s(NULL, "{} ", &nextTok);
-		while (*token)
-		{
-			score[i] = *token;
-			token++;
-			i++;
-		}
-		i = 0;
-		token = strtok_s(NULL, "{} ", &nextTok);
-		while (*token)
-		{
-			sceneBuf[i] = *token;
-			token++;
-			i++;
-		}
-		i = 0;
+	else if (strcmp(command, "Minigame") == 0) 
+	{
+		
 		// Run appropriate minigame with score and scenebuf as input.
+		miniManager.init(parameters);
 		if (fp) {
 			fclose(fp);
 		}
-
 		return 3;
+	}
+
+	else if (strcmp(command, "Brownie") == 0)
+	{
+		
+		token = strtok_s(parameters, " ", &nextTok);
+		if (strncmp(token, "Mifune", strlen("Mifune")) == 0)
+		{
+			token = strtok_s(NULL, " ", &nextTok);
+			Mifune += std::stoi(token);
+		}
+
+		if (strncmp(token, "Inori", strlen("Inori")) == 0)
+		{
+			token = strtok_s(NULL, " ", &nextTok);
+			Inori += std::stoi(token);
+		}
+
+		if (strncmp(token, "Tojihime", strlen("Tojihime")) == 0)
+		{
+			token = strtok_s(NULL, " ", &nextTok);
+			Tojihime += std::stoi(token);
+		}
+
+		if (strncmp(token, "Akari", strlen("Akari")) == 0)
+		{
+			token = strtok_s(NULL, " ", &nextTok);
+			Akari += std::stoi(token);
+		}
+		
+		
 	}
 
 	else if (strcmp(command, "Transition") == 0) {
 		// send command to transition class with paramters as parameters.
-		
+		token = strtok_s(parameters, " :", &nextTok);
+		if (strncmp(token, "FadeToBlack", sizeof("FadeToBlack")) == 0)
+		{
+			token = strtok_s(NULL, " :", &nextTok);
+			if (strncmp(token, "Hallway", sizeof("Hallway")) == 0)
+			{
+				transistor.init(0, time);
+			}
+			if (strncmp(token, "Home", sizeof("Home")) == 0)
+			{
+				transistor.init(1, time);
+			}
+			if (strncmp(token, "OutsideSchool", sizeof("OutsideSchool")) == 0)
+			{
+				transistor.init(2, time);
+			}
+			if (strncmp(token, "Office", sizeof("Office")) == 0)
+			{
+				transistor.init(3, time);
+			}
+			if (strncmp(token, "Lockers", sizeof("Lockers")) == 0)
+			{
+				transistor.init(4, time);
+			}
+			if (strncmp(token, "OfficeVP", sizeof("OfficeVP")) == 0)
+			{
+				transistor.init(5, time);
+			}
+			if (strncmp(token, "TitleScreen", sizeof("TitleScreen")) == 0)
+			{
+				transistor.init(6, time);
+			}
+			if (strncmp(token, "Settings", sizeof("Settings")) == 0)
+			{
+				transistor.init(7, time);
+			}
+		}
+
+		if (strncmp(token, "None", sizeof("None")) == 0)
+		{
+			token = strtok_s(NULL, " :", &nextTok);
+			if (strncmp(token, "Hallway", sizeof("Hallway")) == 0)
+			{
+				backdrop.setBackground(0);
+			}
+			if (strncmp(token, "Home", sizeof("Home")) == 0)
+			{
+				backdrop.setBackground(1);
+			}
+			if (strncmp(token, "OutsideSchool", sizeof("OutsideSchool")) == 0)
+			{
+				backdrop.setBackground(2);
+			}
+			if (strncmp(token, "Office", sizeof("Office")) == 0)
+			{
+				backdrop.setBackground(3);
+			}
+			if (strncmp(token, "Lockers", sizeof("Lockers")) == 0)
+			{
+				backdrop.setBackground(4);
+			}
+			if (strncmp(token, "OfficeVP", sizeof("OfficeVP")) == 0)
+			{
+				backdrop.setBackground(5);
+			}
+			if (strncmp(token, "TitleScreen", sizeof("TitleScreen")) == 0)
+			{
+				backdrop.setBackground(6);
+			}
+			if (strncmp(token, "Settings", sizeof("Settings")) == 0)
+			{
+				backdrop.setBackground(7);
+			}
+		}
 		getNextCommand();
 	}
 
+	else if (strcmp(command, "Choose") == 0) 
+	{
+		// Send parameters to choice.h
+		choice.init(parameters);
+		return 4;
+	}
 	else if (strcmp(command, "Chapter") == 0) {
-		//Weird text glitch from following line. Dunno why.
+		
 		char temp[1000];
 		memcpy_s(temp, sizeof(temp), parameters, sizeof(parameters));
 		setChOff(std::stoi(temp), 0);
@@ -196,25 +276,131 @@ int TextGrabber::execCommand(SoundManager& sounds, TextHandler& drawText) {
 
 		getNextCommand();
 	}
-	else if (strcmp(command, "Exit") == 0) {
-		// send command to poseart manager
-
+	else if (strcmp(command, "Exit") == 0) 
+	{
+		// 00 = Toji, 10 = Mifune, 20 = Inori, 30 = Akari, 40 = Emilia, 50 = ???, 60 = Anon Faculty, 70 = Vice Principal
+		token = strtok_s(parameters, " ", &nextTok);
+		if (strncmp(token, "Mifune", strlen("Mifune")) == 0)
+		{
+			pose.exit(10);
+		}
+		else if (strncmp(token, "Akari", strlen("Akari")) == 0)
+		{
+			pose.exit(30);
+		}
+		else if (strncmp(token, "Inori", strlen("Inori")) == 0)
+		{
+			pose.exit(20);
+		}
+		else if (strncmp(token, "Tojihime", strlen("Tojihime")) == 0)
+		{
+			pose.exit(0);
+		}
+		else if (strncmp(token, "A.Faculty", strlen("A.Faculty")) == 0)
+		{
+			pose.exit(60);
+		}
+		else if (strncmp(token, "VP", strlen("VP")) == 0)
+		{
+			pose.exit(70);
+		}
+		getNextCommand();
+	}
+	else if (strcmp(command, "ExitAll") == 0)
+	{
+		pose.exitAll();
 		getNextCommand();
 	}
 	else if (strcmp(command, "Quit") == 0) {
 		if (fp) {
 			fclose(fp);
 		}
-		return 0;
+		exit(0);
 	}
-	else if (strcmp(command, "Enter") == 0) {
-		// send command to poseart manager
-		
+	else if (strcmp(command, "Enter") == 0) 
+	{
+		// Send command to poseart manager
+		// 00 = Toji, 10 = Mifune, 20 = Inori, 30 = Akari, 40 = Emilia, 50 = ???, 60 = Anon Faculty, 70 = Vice Principal
+		if (strncmp(parameters, "Mifune", strlen("Mifune")) == 0)
+		{
+			token = strtok_s(parameters, " ", &nextTok);
+			token = strtok_s(NULL, " ", &nextTok);
+			pose.enter(10);
+		}
+		if (strncmp(parameters, "Akari", strlen("Akari")) == 0)
+		{
+			token = strtok_s(parameters, " ", &nextTok);
+			token = strtok_s(NULL, " ", &nextTok);
+			pose.enter(30);
+		}
+		if (strncmp(parameters, "Inori", strlen("Inori")) == 0)
+		{
+			token = strtok_s(parameters, " ", &nextTok);
+			token = strtok_s(NULL, " ", &nextTok);
+			pose.enter(20);
+		}
+		if (strncmp(parameters, "Tojihime", strlen("Tojihime")) == 0)
+		{
+			token = strtok_s(parameters, " ", &nextTok);
+			token = strtok_s(NULL, " ", &nextTok);
+			pose.enter(0);
+		}
+		if (strncmp(parameters, "A.Faculty", strlen("A.Faculty")) == 0)
+		{
+			token = strtok_s(parameters, " ", &nextTok);
+			token = strtok_s(NULL, " ", &nextTok);
+			pose.enter(60);
+		}
+		if (strncmp(parameters, "VP", strlen("VP")) == 0)
+		{
+			token = strtok_s(parameters, " ", &nextTok);
+			token = strtok_s(NULL, " ", &nextTok);
+			pose.enter(70);
+		}
+		if (strncmp(parameters, "Emilia", strlen("Emilia")) == 0)
+		{
+			token = strtok_s(parameters, " ", &nextTok);
+			token = strtok_s(NULL, " ", &nextTok);
+			pose.enter(40);
+		}
+		getNextCommand();
 	}
 
 	else {
-		// It's a character talking. Send name to poseart manager.
-		if (firstInstance) {
+
+		if (firstInstance) 
+		{
+			// It's a character talking. Send name to poseart manager.
+			// 00 = Toji, 10 = Mifune, 20 = Inori, 30 = Akari, 40 = Emilia, 50 = ???, 60 = Anon Faculty, 70 = Vice Principal
+			 if (strncmp(command, "Tojihime", strlen("Tojihime")) == 0)
+			{
+				pose.enter(0);
+			}
+			else if (strncmp(command, "Mifune", strlen("Mifune")) == 0)
+			{
+				pose.enter(10);
+			}
+			else if (strncmp(command, "Inori", strlen("Inori")) == 0)
+			{
+				pose.enter(20);
+			}
+			else if (strncmp(command, "Akari", strlen("Akari")) == 0)
+			{
+				pose.enter(30);
+			}
+			else if (strncmp(command, "Emilia", strlen("Emilia")) == 0)
+			{
+				pose.enter(40);
+			}
+			else if (strncmp(command, "A.Faculty", strlen("A.Faculty")) == 0)
+			{
+				pose.enter(60);
+			}
+			else if (strncmp(command, "VP", strlen("VP")) == 0)
+			{
+				pose.enter(70);
+			}
+
 			drawText.resetMyTime();
 			firstInstance = false;
 		}
